@@ -33,6 +33,14 @@ log = logging.getLogger("BilletIA")
 app = Flask(__name__, static_folder=".", static_url_path="")
 CORS(app)
 
+@app.after_request
+def after_request_cors(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["ngrok-skip-browser-warning"] = "true"
+    return response
+
 BASE_DIR     = Path(__file__).parent.resolve()
 MODEL_PATH   = BASE_DIR / "models" / "banknote_efficientnetv2s.pt"
 CLASSES_PATH = BASE_DIR / "models" / "classes.json"

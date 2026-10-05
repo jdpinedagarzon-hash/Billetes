@@ -14,8 +14,27 @@ var CONFIG = (function() {
     window.location.protocol === "file:"
   );
 
-  // URL por defecto para el túnel de ngrok cuando se publica en GitHub Pages
-  var NGROK_DEFAULT = "https://noma-doxastic-buzzingly.ngrok-free.dev";
+  // URL activa de tu túnel ngrok actual
+  var NGROK_DEFAULT = "https://9c56-181-53-12-63.ngrok-free.app";
+
+  // Interceptar window.fetch para inyectar automáticamente la cabecera ngrok-skip-browser-warning
+  var originalFetch = window.fetch;
+  window.fetch = function(input, init) {
+    init = init || {};
+    init.headers = init.headers || {};
+
+    if (init.headers instanceof Headers) {
+      if (!init.headers.has("ngrok-skip-browser-warning")) {
+        init.headers.set("ngrok-skip-browser-warning", "true");
+      }
+    } else if (Array.isArray(init.headers)) {
+      init.headers.push(["ngrok-skip-browser-warning", "true"]);
+    } else {
+      init.headers["ngrok-skip-browser-warning"] = "true";
+    }
+
+    return originalFetch.call(this, input, init);
+  };
 
   function getApiBase() {
     var stored = localStorage.getItem("visioncash_api_url");
@@ -44,7 +63,10 @@ var CONFIG = (function() {
   // Comprobar estado de conexión con el backend
   function verificarConexion(callback) {
     var url = apiUrl("/api/status");
-    fetch(url, { method: "GET" })
+    fetch(url, { 
+      method: "GET",
+      headers: { "ngrok-skip-browser-warning": "true" }
+    })
       .then(function(res) { return res.json(); })
       .then(function(data) {
         if (callback) callback(true, data);
@@ -60,13 +82,14 @@ var CONFIG = (function() {
 
     var widget = document.createElement("div");
     widget.id = "ngrok-status-widget";
-    widget.style.cssText = "position:fixed; bottom:16px; right:16px; z-index:9999; display:flex; align-items:center; gap:8px; background:#0b1838; color:#fff; padding:8px 14px; border-radius:999px; box-shadow:0 6px 20px rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.15); font-size:13px; font-family:system-ui,sans-serif; cursor:pointer;";
+    widget.style.cssText = "position:fixed; bottom:16px; right:16px; z-index:9999; display:flex; align-items:center; gap:8px; background:#0b1838; color:#fff; padding:9px 16px; border-radius:999px; box-shadow:0 6px 22px rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.2); font-size:13.5px; font-family:system-ui,-apple-system,sans-serif; cursor:pointer; user-select:none; transition:all 0.2s ease;";
     
     var dot = document.createElement("span");
-    dot.style.cssText = "width:8px; height:8px; border-radius:50%; background:#f59e0b; display:inline-block;";
+    dot.style.cssText = "width:10px; height:10px; border-radius:50%; background:#f59e0b; display:inline-block; transition:all 0.3s ease;";
     
     var label = document.createElement("span");
-    label.textContent = isLocal ? "Localhost (5000)" : "ngrok Backend";
+    label.style.fontWeight = "600";
+    label.textContent = isLocal ? "Localhost (5000)" : "Comprobando ngrok...";
 
     var btnConfig = document.createElement("span");
     btnConfig.textContent = "⚙️";
@@ -81,21 +104,21 @@ var CONFIG = (function() {
     verificarConexion(function(ok, res) {
       if (ok) {
         dot.style.background = "#10b981";
-        dot.style.boxShadow = "0 0 8px #10b981";
+        dot.style.boxShadow = "0 0 10px #10b981";
         label.textContent = isLocal ? "Backend Local Activo" : "ngrok Conectado";
       } else {
         dot.style.background = "#ef4444";
-        dot.style.boxShadow = "0 0 8px #ef4444";
-        label.textContent = isLocal ? "Backend Offline" : "ngrok Desconectado";
+        dot.style.boxShadow = "0 0 10px #ef4444";
+        label.textContent = isLocal ? "Backend Offline" : "ngrok Desconectado (Clic aquí)";
       }
     });
 
     widget.onclick = function() {
-      var actual = getApiBase() || "http://localhost:5000";
-      var nueva = prompt("🔧 Configuración de conexión Cliente-Servidor:\n\nIngresa la URL pública de tu túnel ngrok (ej: https://xxxx.ngrok-free.dev):", actual);
-      if (nueva !== null) {
+      var actual = getApiBase() || NGROK_DEFAULT;
+      var nueva = prompt("🔧 Configuración de conexión Cliente-Servidor:\n\nIngresa la URL pública de tu túnel ngrok activo:", actual);
+      if (nueva !== null && nueva.trim()) {
         setApiBase(nueva);
-        alert("URL guardada. Comprobando conexión...");
+        alert("¡URL guardada! Reconectando con el backend...");
         window.location.reload();
       }
     };
