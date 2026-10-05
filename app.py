@@ -816,6 +816,10 @@ def api_calificar_ticket(codigo):
                 WHERE codigo_ticket = %s OR id = %s;
             """, (estrellas, codigo, codigo))
         conn.close()
+        return jsonify({"success": True, "mensaje": f"Calificación de {estrellas} estrellas registrada."})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 # ─── 8. Proxy al Microservicio de Historial (Puerto 5001) ───────────────────
 import urllib.request
