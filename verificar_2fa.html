@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BilletIA · Verificaci&oacute;n 2FA</title>
+<meta name="description" content="Verificación en dos pasos para el acceso seguro a tu cuenta de BilletIA." />
+<style>
+  :root {
+    --navy-900: #0a1633;
+    --navy-800: #0d1b3e;
+    --navy-700: #10214a;
+    --blue: #2f7bff;
+    --blue-bright: #3b82f6;
+    --purple: #6d3bf5;
+    --teal: #14b8a6;
+    --amber: #f5b13b;
+    --page-bg: #eef1f8;
+    --card: #ffffff;
+    --text-dark: #1e2a52;
+    --text-muted: #55608a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--page-bg);
+    color: var(--text-dark);
+    line-height: 1.5;
+  }
+
+  a { text-decoration: none; color: inherit; }
+
+  .container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* ===== Header ===== */
+  .site-header {
+    background: linear-gradient(180deg, #0b1838 0%, #0d1c40 100%);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .brand img { width: 74px; height: 74px; object-fit: contain; }
+  .brand-name {
+    font-size: 30px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .brand-name .ia { color: var(--blue-bright); }
+  .brand-tagline {
+    font-size: 15px;
+    color: #b9c3e0;
+    margin-top: 2px;
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+  .nav a { color: #dbe2f5; font-size: 17px; font-weight: 500; }
+  .nav a:hover { color: #fff; }
+  .nav .pill {
+    background: linear-gradient(90deg, var(--blue) 0%, var(--purple) 100%);
+    color: #fff;
+    padding: 13px 26px;
+    border-radius: 999px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(60,90,240,0.4);
+  }
+
+  /* ===== Main ===== */
+  main { padding: 40px 0 10px; }
+
+  /* ===== Auth Layout ===== */
+  .auth-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 30px;
+    align-items: stretch;
+    margin-bottom: 50px;
+  }
+
+  .auth-card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 44px 40px;
+    box-shadow: 0 12px 30px rgba(30,42,82,0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .auth-card h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--navy-900);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .auth-card p {
+    color: var(--text-muted);
+    font-size: 15.5px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .user-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #eef4ff;
+    color: var(--blue);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    width: fit-content;
+  }
+
+  .qr-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f8faff;
+    border: 2px dashed #cfd9ed;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 22px;
+    text-align: center;
+  }
+  .qr-box svg {
+    width: 160px;
+    height: 160px;
+    border-radius: 10px;
+    background: #fff;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(30,42,82,0.06);
+  }
+  .qr-box span {
+    margin-top: 10px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+  }
+
+  .manual-key-wrap {
+    margin-bottom: 22px;
+  }
+  .manual-key-wrap label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+  }
+  .manual-key-row {
+    display: flex;
+    gap: 10px;
+  }
+  .manual-key-row input {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid #cfd9ed;
+    background: #f4f6fb;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy-900);
+    letter-spacing: 1px;
+    outline: none;
+  }
+  .copy-btn {
+    background: var(--navy-900);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .copy-btn:hover {
+    background: var(--blue);
+  }
+
+  .input-group {
+    margin-bottom: 20px;
+  }
+  .input-group label {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+  }
+  .input-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid #cfd9ed;
+    background: #fff;
+    font-size: 20px;
+    letter-spacing: 6px;
+    text-align: center;
+    font-weight: 800;
+    color: var(--text-dark);
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  .input-group input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px rgba(47,123,255,0.15);
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background: linear-gradient(90deg, var(--blue) 0%, var(--purple) 100%);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(60,90,240,0.35);
+    transition: all 0.25s ease;
+  }
+  .button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(60,90,240,0.5);
+  }
+
+  .auth-links {
+    margin-top: 22px;
+    font-size: 14.5px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+  .auth-links a {
+    color: var(--blue);
+    font-weight: 700;
+  }
+  .auth-links a:hover {
+    text-decoration: underline;
+  }
+
+  /* ===== Side Info Card ===== */
+  .side-info {
+    position: relative;
+    overflow: hidden;
+    border-radius: 22px;
+    background:
+      radial-gradient(120% 120% at 85% 20%, rgba(109,59,245,0.55) 0%, rgba(13,27,64,0) 55%),
+      linear-gradient(120deg, #0b1838 0%, #14204d 55%, #241a5c 100%);
+    padding: 44px 40px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .side-info h3 {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+  .side-info h3 .accent {
+    color: var(--blue-bright);
+  }
+  .side-info p {
+    font-size: 16px;
+    color: #c9d2ec;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+  .info-list {
+    list-style: none;
+    display: grid;
+    gap: 16px;
+  }
+  .info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .info-item-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .info-item div strong {
+    display: block;
+    color: #fff;
+    font-size: 15px;
+    margin-bottom: 2px;
+  }
+  .info-item div span {
+    font-size: 13.5px;
+    color: #b9c3e0;
+    line-height: 1.5;
+  }
+
+  /* ===== Footer ===== */
+  .site-footer {
+    background: linear-gradient(180deg, #0c1a3d 0%, #0a1430 100%);
+    color: #c4cdea;
+    padding: 56px 0 0;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: 50px;
+    padding-bottom: 44px;
+  }
+  .footer-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+  .footer-brand img { width: 62px; height: 62px; object-fit: contain; }
+  .footer-brand .brand-name { font-size: 26px; }
+  .footer-brand .brand-tagline { font-size: 13px; }
+  .footer-col p { font-size: 15.5px; line-height: 1.7; color: #aab5d8; }
+  .footer-col h4 {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+  .footer-links li { display: flex; align-items: center; gap: 12px; }
+  .footer-links svg { width: 20px; height: 20px; stroke: #6f8bff; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+  .footer-links a { color: #aab5d8; }
+  .footer-links a:hover { color: #fff; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    padding: 24px 0;
+    font-size: 15px;
+    color: #9aa6cc;
+  }
+  .footer-bar { height: 8px; background: linear-gradient(90deg, #2f7bff 0%, #6d3bf5 100%); }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 1100px) {
+    .auth-layout { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 720px) {
+    .container { padding: 0 20px; }
+    .header-inner { flex-direction: column; gap: 18px; padding: 20px; }
+    .nav { gap: 20px; flex-wrap: wrap; justify-content: center; }
+    .auth-card { padding: 32px 22px; }
+    .side-info { padding: 32px 22px; }
+    .footer-grid { grid-template-columns: 1fr; gap: 34px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <img src="billetia-logo.png" alt="Logo de BilletIA" />
+        <div>
+          <div class="brand-name">Billet<span class="ia">IA</span></div>
+          <div class="brand-tagline">Reconoce &middot; Analiza &middot; Confiable</div>
+        </div>
+      </a>
+      <nav class="nav" aria-label="Navegaci&oacute;n principal">
+        <a href="index.html">Inicio</a>
+        <a href="acerca_nosotros.html">Acerca de nosotros</a>
+        <a href="Contacto.html">Contacto</a>
+        <a href="Menu_principal_2.html">Iniciar sesi&oacute;n</a>
+        <a href="Menu_principal_3.html">Registrarse</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main>
+    <div class="container">
+      <section class="auth-layout">
+
+        <!-- 2FA Card -->
+        <div class="auth-card">
+          <h2>Verificaci&oacute;n en dos pasos</h2>
+          <p>Escanea el c&oacute;digo QR o ingresa la clave manual en tu app de autenticaci&oacute;n para autorizar tu inicio de sesi&oacute;n.</p>
+
+          <div class="user-badge" id="userBadge">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span id="userBadgeText">Usuario: Cargando...</span>
+          </div>
+
+          <div class="qr-box" id="qrContainer" style="background:#f8faff; border:2px dashed #bfdbfe; border-radius:18px; padding:22px; text-align:center;">
+            <div id="qrLoading" style="font-size:14px; color:var(--text-muted); padding:30px 0;">
+              <span style="font-size:32px; display:block; margin-bottom:10px;">📱</span>
+              Generando código QR oficial para tu app de autenticación...
+            </div>
+            <img id="qrRealImg" src="" alt="Código QR 2FA Oficial" style="display:none; width:190px; height:190px; margin:0 auto; background:#fff; padding:8px; border-radius:12px; box-shadow:0 6px 18px rgba(30,42,82,0.08);" />
+            <span style="display:block; margin-top:12px; font-size:13.5px; color:var(--navy-900); font-weight:600;">
+              📱 Escanea este código con: <strong style="color:var(--blue);">Google Authenticator</strong>, <strong style="color:var(--blue);">Microsoft Authenticator</strong> o <strong>Authy</strong>
+            </span>
+          </div>
+
+          <div class="manual-key-wrap">
+            <label for="claveManual2fa">&iquest;No puedes escanear el QR? Ingresa esta clave manual en tu app:</label>
+            <div class="manual-key-row">
+              <input type="text" id="claveManual2fa" readonly value="Cargando clave..." />
+              <button type="button" class="copy-btn" id="btnCopiarClave">Copiar</button>
+            </div>
+            <span style="font-size:12.5px; color:var(--text-muted); margin-top:5px; display:block;">
+              Tipo: <strong>Basada en tiempo (TOTP)</strong> &middot; Servicio: <strong>VisionCash</strong>
+            </span>
+          </div>
+
+          <form id="verify2faForm" action="#" method="post">
+            <div class="input-group">
+              <label for="codigo_2fa">C&oacute;digo de 6 d&iacute;gitos</label>
+              <input type="text" id="codigo_2fa" name="codigo_2fa" maxlength="6" placeholder="123456" autocomplete="one-time-code" required />
+            </div>
+            <button class="button" type="submit">Verificar y Entrar</button>
+          </form>
+
+          <p class="auth-links">&iquest;Problemas para verificar? <a href="Menu_principal_2.html">Volver a iniciar sesi&oacute;n</a> &middot; <a href="Contacto.html">Ayuda</a></p>
+        </div>
+
+        <!-- Info / Security Card -->
+        <div class="side-info">
+          <h3>Seguridad de <span class="accent">doble factor</span></h3>
+          <p>BilletIA implementa autenticaci&oacute;n 2FA (TOTP) para proteger tus registros y garantizar que solo t&uacute; tengas acceso a tus escaneos e informaci&oacute;n.</p>
+          
+          <ul class="info-list">
+            <li class="info-item">
+              <div class="info-item-icon">&#128274;</div>
+              <div>
+                <strong>Protecci&oacute;n avanzada</strong>
+                <span>Evita accesos no autorizados incluso si tu contrase&ntilde;a llega a ser vulnerada.</span>
+              </div>
+            </li>
+            <li class="info-item">
+              <div class="info-item-icon">&#128241;</div>
+              <div>
+                <strong>Apps compatibles</strong>
+                <span>Funciona con Google Authenticator, Microsoft Authenticator, Authy o 1Password.</span>
+              </div>
+            </li>
+            <li class="info-item">
+              <div class="info-item-icon">&#9889;</div>
+              <div>
+                <strong>Acceso r&aacute;pido</strong>
+                <span>C&oacute;digos temporales de 30 segundos que no requieren conexi&oacute;n a internet en tu m&oacute;vil.</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-brand">
+            <img src="billetia-logo.png" alt="Logo de BilletIA" />
+            <div>
+              <div class="brand-name">Billet<span class="ia" style="color:var(--blue-bright)">IA</span></div>
+              <div class="brand-tagline">Reconoce &middot; Analiza &middot; Confiable</div>
+            </div>
+          </div>
+          <p>BilletIA es una soluci&oacute;n de inteligencia artificial dise&ntilde;ada para facilitar la identificaci&oacute;n de billetes colombianos a trav&eacute;s de la c&aacute;mara de tu dispositivo.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Gracias por visitar</h4>
+          <p>Tu confianza nos motiva a seguir mejorando. Si encuentras alg&uacute;n inconveniente o tienes sugerencias, no dudes en contactarnos. Estamos para ayudarte.</p>
+        </div>
+
+        <div class="footer-col">
+          <ul class="footer-links">
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+              <a href="Contacto.html">Contacto</a>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              <a href="Terminos.html">T&eacute;rminos y condiciones</a>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <a href="Politicas.html">Pol&iacute;ticas de privacidad</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        &copy; 2025 BilletIA &nbsp;&middot;&nbsp; Inteligencia artificial al servicio de tu seguridad financiera.
+      </div>
+    </div>
+    <div class="footer-bar"></div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script>
+    var params = new URLSearchParams(window.location.search);
+    var pendingUser = (params.get("username") || localStorage.getItem("gv_pending_user") || "Usuario").trim();
+    
+    document.getElementById("userBadgeText").textContent = "Usuario: " + pendingUser;
+
+    var qrLoading = document.getElementById("qrLoading");
+    var qrRealImg = document.getElementById("qrRealImg");
+    var inputClave = document.getElementById("claveManual2fa");
+    var inputCode = document.getElementById("codigo_2fa");
+    var btnSubmit = document.querySelector("#verify2faForm button[type='submit']");
+
+    if (inputCode) {
+      inputCode.value = "";
+      inputCode.focus();
+    }
+
+    // 1. Cargar el Código QR Real generado para el usuario desde el servidor (TOTP RFC 6238)
+    function cargarCodigoQRReal() {
+      fetch(CONFIG.apiUrl("/api/auth/obtener-2fa-qr?usuario=" + encodeURIComponent(pendingUser)))
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.success && data.qr_imagen) {
+            qrLoading.style.display = "none";
+            qrRealImg.src = data.qr_imagen;
+            qrRealImg.style.display = "block";
+            inputClave.value = data.secreto_totp;
+          } else {
+            qrLoading.innerHTML = "⚠️ Error al generar código QR: " + (data.error || "Intenta recargar");
+          }
+        })
+        .catch(function(err) {
+          qrLoading.innerHTML = "⚠️ No se pudo conectar con el servidor para generar el QR.";
+        });
+    }
+
+    var btnCopiar = document.getElementById("btnCopiarClave");
+    btnCopiar.addEventListener("click", function() {
+      var val = inputClave.value;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(val).then(function() {
+          btnCopiar.textContent = "¡Copiado!";
+          setTimeout(function() { btnCopiar.textContent = "Copiar"; }, 1500);
+        });
+      } else {
+        inputClave.select();
+        document.execCommand("copy");
+        btnCopiar.textContent = "¡Copiado!";
+        setTimeout(function() { btnCopiar.textContent = "Copiar"; }, 1500);
+      }
+    });
+
+    // 2. Verificar el código de 6 dígitos que entrega Google Authenticator / Microsoft Authenticator / Authy
+    document.getElementById("verify2faForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      var code = inputCode.value.trim();
+      if (!/^\d{6}$/.test(code)) {
+        alert("Por favor ingresa el código de 6 dígitos generado por tu app de autenticación.");
+        return;
+      }
+
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = "Validando con tu app...";
+
+      fetch(CONFIG.apiUrl("/api/auth/verificar-2fa"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuario: pendingUser, codigo_2fa: code })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = "Verificar y Entrar";
+        if (data.success) {
+          sessionStorage.setItem("gv_auth_user", pendingUser);
+          sessionStorage.setItem("gv_auth_expiry", Date.now() + 8 * 3600 * 1000);
+          localStorage.removeItem("gv_pending_user");
+          localStorage.removeItem("gv_pending_code");
+          window.location.href = "Menu_principal.html";
+        } else {
+          alert("Código incorrecto: " + (data.error || "Verifica el código en tu app e inténtalo de nuevo"));
+        }
+      })
+      .catch(function(err) {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = "Verificar y Entrar";
+        alert("Error de comunicación: " + err.message);
+      });
+    });
+
+    cargarCodigoQRReal();
+  </script>
+
+</body>
+</html>

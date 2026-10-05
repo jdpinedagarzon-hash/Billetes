@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VisionCash · T&eacute;rminos y Condiciones</title>
+<meta name="description" content="Términos y condiciones de uso de VisionCash. Conoce las reglas y responsabilidades al usar nuestra plataforma." />
+<style>
+  :root {
+    --navy-900: #0a1633;
+    --navy-800: #0d1b3e;
+    --navy-700: #10214a;
+    --blue: #2f7bff;
+    --blue-bright: #3b82f6;
+    --purple: #6d3bf5;
+    --teal: #14b8a6;
+    --amber: #f5b13b;
+    --page-bg: #eef1f8;
+    --card: #ffffff;
+    --text-dark: #1e2a52;
+    --text-muted: #55608a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--page-bg);
+    color: var(--text-dark);
+    line-height: 1.5;
+  }
+
+  a { text-decoration: none; color: inherit; }
+
+  .container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* ===== Header ===== */
+  .site-header {
+    background: linear-gradient(180deg, #0b1838 0%, #0d1c40 100%);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .brand img { width: 74px; height: 74px; object-fit: contain; }
+  .brand-name {
+    font-size: 30px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .brand-name .ia { color: var(--blue-bright); }
+  .brand-tagline {
+    font-size: 15px;
+    color: #b9c3e0;
+    margin-top: 2px;
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+  .nav a { color: #dbe2f5; font-size: 17px; font-weight: 500; }
+  .nav a:hover { color: #fff; }
+  .nav .pill {
+    background: linear-gradient(90deg, var(--blue) 0%, var(--purple) 100%);
+    color: #fff;
+    padding: 13px 26px;
+    border-radius: 999px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(60,90,240,0.4);
+  }
+
+  /* ===== Hero ===== */
+  main { padding: 40px 0 10px; }
+  .hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 22px;
+    background:
+      radial-gradient(120% 120% at 85% 20%, rgba(109,59,245,0.55) 0%, rgba(13,27,64,0) 55%),
+      linear-gradient(120deg, #0b1838 0%, #14204d 55%, #241a5c 100%);
+    padding: 60px 64px;
+  }
+  .hero h1 {
+    font-size: 48px;
+    line-height: 1.1;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -1px;
+  }
+  .hero p {
+    margin-top: 20px;
+    max-width: 620px;
+    font-size: 19px;
+    color: #c9d2ec;
+    line-height: 1.65;
+  }
+  .hero .date {
+    margin-top: 12px;
+    font-size: 15px;
+    color: #9aa6cc;
+    font-weight: 600;
+  }
+
+  /* ===== Legal Section ===== */
+  .content-section {
+    padding: 40px 0 60px;
+  }
+  .legal-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 42px 38px;
+    box-shadow: 0 12px 30px rgba(30,42,82,0.08);
+  }
+  .legal-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 32px 0 12px;
+    padding-left: 16px;
+    border-left: 4px solid var(--blue);
+  }
+  .legal-card h3:first-child { margin-top: 0; }
+  .legal-card p {
+    font-size: 16px;
+    color: var(--text-muted);
+    line-height: 1.75;
+  }
+  .legal-card a {
+    color: var(--blue);
+    font-weight: 600;
+  }
+  .legal-card a:hover {
+    color: var(--purple);
+  }
+
+  /* ===== Footer ===== */
+  .site-footer {
+    background: linear-gradient(180deg, #0c1a3d 0%, #0a1430 100%);
+    color: #c4cdea;
+    padding: 56px 0 0;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: 50px;
+    padding-bottom: 44px;
+  }
+  .footer-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+  .footer-brand img { width: 62px; height: 62px; object-fit: contain; }
+  .footer-brand .brand-name { font-size: 26px; }
+  .footer-brand .brand-tagline { font-size: 13px; }
+  .footer-col p { font-size: 15.5px; line-height: 1.7; color: #aab5d8; }
+  .footer-col h4 {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+  .footer-links li { display: flex; align-items: center; gap: 12px; }
+  .footer-links svg { width: 20px; height: 20px; stroke: #6f8bff; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+  .footer-links a { color: #aab5d8; }
+  .footer-links a:hover { color: #fff; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    padding: 24px 0;
+    font-size: 15px;
+    color: #9aa6cc;
+  }
+  .footer-bar { height: 8px; background: linear-gradient(90deg, #2f7bff 0%, #6d3bf5 100%); }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 1100px) {
+    .hero { padding: 48px 40px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 720px) {
+    .container { padding: 0 20px; }
+    .header-inner { flex-direction: column; gap: 18px; padding: 20px; }
+    .nav { gap: 20px; flex-wrap: wrap; justify-content: center; }
+    .hero { padding: 36px 26px; }
+    .hero h1 { font-size: 36px; }
+    .legal-card { padding: 28px 22px; }
+    .footer-grid { grid-template-columns: 1fr; gap: 34px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <img src="billetia-logo.png" alt="Logo de VisionCash" />
+        <div>
+          <div class="brand-name">Vision<span class="ia">Cash</span></div>
+          <div class="brand-tagline">Reconoce &middot; Analiza &middot; Confiable</div>
+        </div>
+      </a>
+      <nav class="nav" aria-label="Navegaci&oacute;n principal">
+        <a href="index.html">Inicio</a>
+        <a href="acerca_nosotros.html">Acerca de nosotros</a>
+        <a href="Contacto.html">Contacto</a>
+        <a href="Menu_principal_2.html">Iniciar sesi&oacute;n</a>
+        <a href="Menu_principal_3.html">Registrarse</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main>
+    <div class="container">
+
+      <!-- Hero -->
+      <section class="hero">
+        <h1>T&eacute;rminos y Condiciones</h1>
+        <p>Al usar VisionCash aceptas las siguientes condiciones que regulan el acceso y uso de nuestra plataforma.</p>
+        <div class="date">&Uacute;ltima actualizaci&oacute;n: 21 de febrero de 2026</div>
+      </section>
+
+      <!-- Legal Content -->
+      <section class="content-section">
+        <div class="legal-card">
+          <h3>1. Aceptaci&oacute;n</h3>
+          <p>Al usar VisionCash aceptas estos t&eacute;rminos y nuestra <a href="Politicas.html">Pol&iacute;tica de Privacidad</a>.</p>
+
+          <h3>2. Uso de la plataforma</h3>
+          <p>Debes utilizar la plataforma de forma legal y responsable, evitando cualquier actividad que afecte a terceros.</p>
+
+          <h3>3. Cuenta de usuario</h3>
+          <p>Eres responsable de la informaci&oacute;n que registras y de mantener segura tu contrase&ntilde;a y m&eacute;todos de verificaci&oacute;n.</p>
+
+          <h3>4. Propiedad intelectual</h3>
+          <p>Los contenidos, dise&ntilde;os y recursos de VisionCash son propiedad del proyecto o de sus respectivos titulares.</p>
+
+          <h3>5. Limitaci&oacute;n de responsabilidad</h3>
+          <p>VisionCash ofrece una estimaci&oacute;n tecnol&oacute;gica y educativa; el uso final de la informaci&oacute;n es responsabilidad del usuario.</p>
+
+          <h3>6. Contacto</h3>
+          <p>Para cualquier inquietud legal, visita nuestra secci&oacute;n de <a href="Contacto.html">Contacto</a>.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-brand">
+            <img src="billetia-logo.png" alt="Logo de VisionCash" />
+            <div>
+              <div class="brand-name">Vision<span class="ia" style="color:var(--blue-bright)">Cash</span></div>
+              <div class="brand-tagline">Reconoce &middot; Analiza &middot; Confiable</div>
+            </div>
+          </div>
+          <p>VisionCash es una soluci&oacute;n de inteligencia artificial dise&ntilde;ada para facilitar la identificaci&oacute;n de billetes colombianos a trav&eacute;s de la c&aacute;mara de tu dispositivo.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Gracias por visitar</h4>
+          <p>Tu confianza nos motiva a seguir mejorando. Si encuentras alg&uacute;n inconveniente o tienes sugerencias, no dudes en contactarnos. Estamos para ayudarte.</p>
+        </div>
+
+        <div class="footer-col">
+          <ul class="footer-links">
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+              <a href="Contacto.html">Contacto</a>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              <a href="Terminos.html">T&eacute;rminos y condiciones</a>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <a href="Politicas.html">Pol&iacute;ticas de privacidad</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        &copy; 2025 VisionCash &nbsp;&middot;&nbsp; Inteligencia artificial al servicio de tu seguridad financiera.
+      </div>
+    </div>
+    <div class="footer-bar"></div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="sesion.js"></script>
+</body>
+</html>

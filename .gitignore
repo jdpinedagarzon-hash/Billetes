@@ -1,0 +1,13 @@
+# Entornos y binarios pesados
+augmented_dataset/
+ngrok.exe
+__pycache__/
+*.pyc
+
+# Clasp / Apps Script local configs
+.clasp.json
+
+# IDE / Temporales
+.vscode/
+.idea/
+*.log
