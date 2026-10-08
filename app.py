@@ -832,6 +832,36 @@ def api_calificar_ticket(codigo):
 # ─── 8. Proxy al Microservicio de Historial (Puerto 5001) ───────────────────
 import urllib.request
 import urllib.error
+import socket
+import subprocess
+import sys
+
+
+def asegurar_microservicio_historial():
+    """
+    Verifica si el microservicio en el puerto 5001 está respondiendo.
+    Si está apagado, lo enciende automáticamente como subproceso.
+    """
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(0.5)
+    try:
+        s.connect(("127.0.0.1", 5001))
+        s.close()
+        return True
+    except Exception:
+        pass
+
+    try:
+        script = BASE_DIR / "microservicio_historial.py"
+        if script.exists():
+            log.info("[Auto-Recuperación] Microservicio 5001 apagado. Iniciando automáticamente...")
+            subprocess.Popen([sys.executable, str(script)], cwd=str(BASE_DIR))
+            time.sleep(2.0)
+            return True
+    except Exception as ex:
+        log.error(f"Error autoiniciando microservicio de historial: {ex}")
+    return False
+
 
 @app.route("/api/historial", methods=["GET", "POST", "DELETE", "OPTIONS"])
 @app.route("/api/historial/<path:subpath>", methods=["GET", "POST", "DELETE", "OPTIONS"])
@@ -849,10 +879,9 @@ def proxy_historial(subpath=""):
     if request.query_string:
         target_url += f"?{request.query_string.decode('utf-8')}"
 
-    try:
+    def _hacer_peticion():
         req_headers = {"Content-Type": "application/json"}
         req_data = request.get_data() if request.method in ["POST", "PUT", "PATCH"] else None
-        
         req = urllib.request.Request(
             target_url,
             data=req_data,
@@ -866,6 +895,9 @@ def proxy_historial(subpath=""):
                 status=resp.status,
                 mimetype="application/json"
             )
+
+    try:
+        return _hacer_peticion()
     except urllib.error.HTTPError as e:
         return app.response_class(
             response=e.read(),
@@ -873,11 +905,17 @@ def proxy_historial(subpath=""):
             mimetype="application/json"
         )
     except Exception as e:
-        log.warning(f"Error en proxy a microservicio historial: {e}")
+        log.warning(f"Microservicio en 5001 no respondió ({e}). Intentando auto-levantarlo...")
+        if asegurar_microservicio_historial():
+            try:
+                return _hacer_peticion()
+            except Exception as e2:
+                log.error(f"Error en segundo intento tras auto-inicio: {e2}")
         return jsonify({"success": False, "error": f"Fallo comunicando con microservicio de historial: {str(e)}"}), 502
 
 
 if __name__ == "__main__":
+    asegurar_microservicio_historial()
     load_model()
     print("\n" + "="*58)
     print("  >>> BilletIA / VisionCash Flask ->  http://localhost:5000")
