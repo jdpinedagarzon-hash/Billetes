@@ -15,7 +15,7 @@ var CONFIG = (function() {
   );
 
   // URL activa de tu túnel ngrok actual
-  var NGROK_DEFAULT = "https://ee64-181-53-12-63.ngrok-free.app";
+  var NGROK_DEFAULT = "https://b7f1-181-53-12-63.ngrok-free.app";
 
   // Interceptar window.fetch para inyectar automáticamente la cabecera ngrok-skip-browser-warning
   var originalFetch = window.fetch;
