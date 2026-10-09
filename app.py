@@ -346,7 +346,7 @@ def api_predict():
         if not image_bytes:
             return jsonify({"success": False, "error": "No se recibió imagen."}), 400
 
-        img      = decode_image(image_bytes)
+        img = decode_image(image_bytes)
         avg_probs, orient_info = tta_predict(img)
 
         top_idx  = int(np.argmax(avg_probs))
@@ -378,6 +378,18 @@ def api_predict():
         latency = round((time.time() - t0) * 1000, 1)
         display  = f"{top_pct}% {title}"
 
+        # Identificar origen para imprimir en la consola de Visual Studio
+        client_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+        ua = request.headers.get("User-Agent", "").lower()
+        origen = "📱 CELULAR (App Android)" if ("okhttp" in ua or "android" in ua or "billetesapp" in ua) else "💻 PÁGINA WEB"
+
+        print("\n" + "═"*64)
+        print(f"  🔔 [CLIENTE DETECTADO -> {origen}]")
+        print(f"  📡 IP: {client_ip} | Endpoint: {request.path}")
+        print(f"  💵 BILLETE: {denomination} ({character})")
+        print(f"  🎯 CONFIANZA: {top_pct}% | Latencia: {latency} ms | {HARDWARE_INFO}")
+        print("═"*64 + "\n", flush=True)
+
         return jsonify({
             "success": True,
             "label": denomination,
@@ -404,6 +416,121 @@ def api_predict():
 
     except Exception as e:
         log.error(f"Error en predicción: {e}", exc_info=True)
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/predict-burst", methods=["POST"])
+def api_predict_burst():
+    """
+    Endpoint para análisis de RÁFAGA multi-captura (2 o 3 fotos consecutivas).
+    Combina las distribuciones de probabilidad de los cuadros para máxima precisión.
+    """
+    if MODEL is None:
+        return jsonify({"success": False, "error": "Modelo no cargado."}), 503
+
+    t0 = time.time()
+    images_bytes_list = []
+
+    try:
+        # 1. Extraer archivos de ráfaga desde multipart form-data
+        if request.files:
+            for key in sorted(request.files.keys()):
+                file_obj = request.files[key]
+                content = file_obj.read()
+                if content:
+                    images_bytes_list.append(content)
+        # 2. O extraer de JSON si se enviaron base64
+        elif request.is_json:
+            data = request.get_json()
+            raw_list = data.get("images", [])
+            for b64 in raw_list:
+                if "," in b64:
+                    b64 = b64.split(",", 1)[1]
+                images_bytes_list.append(base64.b64decode(b64))
+
+        if not images_bytes_list:
+            return jsonify({"success": False, "error": "No se recibieron imágenes para la ráfaga."}), 400
+
+        # Procesar cada imagen
+        frame_probabilities = []
+        frame_details = []
+
+        for idx, img_bytes in enumerate(images_bytes_list):
+            try:
+                pil_img = decode_image(img_bytes)
+                probs, orient = tta_predict(pil_img)
+                frame_probabilities.append(probs)
+
+                top_i = int(np.argmax(probs))
+                top_p = float(probs[top_i])
+                ci = CLASSES.get(str(top_i), CLASSES.get(top_i, {}))
+                frame_details.append({
+                    "frame": idx + 1,
+                    "denomination": ci.get("denomination", f"Clase {top_i}"),
+                    "character": ci.get("character", "—"),
+                    "confidence": top_p,
+                    "confidence_str": f"{round(top_p * 100, 1)}%"
+                })
+            except Exception as fe:
+                log.warning(f"Error analizando cuadro {idx+1} de la ráfaga: {fe}")
+
+        if not frame_probabilities:
+            return jsonify({"success": False, "error": "No se pudo procesar ningún cuadro."}), 500
+
+        # Promediar las probabilidades de todos los cuadros (Ensemble Consensus)
+        consensus_probs = np.mean(frame_probabilities, axis=0)
+        final_top_idx = int(np.argmax(consensus_probs))
+        final_top_prob = float(consensus_probs[final_top_idx])
+        final_top_pct = round(final_top_prob * 100, 1)
+
+        info = CLASSES.get(str(final_top_idx), CLASSES.get(final_top_idx, {}))
+        final_denomination = info.get("denomination", f"Clase {final_top_idx}")
+        final_title = info.get("title", final_denomination)
+        final_character = info.get("character", "—")
+        final_reverse = info.get("reverse", "—")
+        final_color = info.get("color", "#2563eb")
+
+        latency = round((time.time() - t0) * 1000, 1)
+
+        # Imprimir en consola de Visual Studio de forma destacada
+        client_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+        ua = request.headers.get("User-Agent", "").lower()
+        origen = "📱 CELULAR (App Android)" if ("okhttp" in ua or "android" in ua or "billetesapp" in ua) else "💻 PÁGINA WEB"
+
+        print("\n" + "═"*66)
+        print(f"  📸 [RÁFAGA MULTI-CAPTURA -> {len(images_bytes_list)} CUADROS DESDE {origen}]")
+        print(f"  📡 IP: {client_ip} | Consenso calculado en GPU ({HARDWARE_INFO})")
+        for fd in frame_details:
+            print(f"     ├─ Cuadro {fd['frame']}: {fd['confidence_str']} -> {fd['denomination']} ({fd['character']})")
+        print(f"  🏆 CONSENSO FINAL: {final_denomination} ({final_character})")
+        print(f"  🎯 CONFIANZA COMBINADA: {final_top_pct}% | Latencia: {latency} ms")
+        print("═"*66 + "\n", flush=True)
+
+        return jsonify({
+            "success": True,
+            "is_burst": True,
+            "frames_analyzed": len(images_bytes_list),
+            "label": final_denomination,
+            "denomination": final_denomination,
+            "confidence": final_top_prob,
+            "prediction": {
+                "denomination": final_denomination,
+                "title": final_title,
+                "character": final_character,
+                "reverse": final_reverse,
+                "color": final_color,
+                "confidence": final_top_prob,
+                "confidence_percent": final_top_pct,
+                "confidence_str": f"{final_top_pct}%",
+                "display_summary": f"{final_top_pct}% {final_title}",
+            },
+            "frame_details": frame_details,
+            "latency_ms": latency,
+            "hardware": HARDWARE_INFO,
+        })
+
+    except Exception as e:
+        log.error(f"Error en predicción por ráfaga: {e}", exc_info=True)
         return jsonify({"success": False, "error": str(e)}), 500
 
 
