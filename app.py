@@ -15,6 +15,8 @@ import time
 import json
 import base64
 import logging
+import threading
+import re
 import numpy as np
 from pathlib import Path
 from PIL import Image, ImageOps, ImageEnhance
@@ -316,6 +318,7 @@ def api_status():
 
 
 @app.route("/api/predict", methods=["POST"])
+@app.route("/predict", methods=["POST"])
 def api_predict():
     if MODEL is None:
         return jsonify({
@@ -377,6 +380,9 @@ def api_predict():
 
         return jsonify({
             "success": True,
+            "label": denomination,
+            "denomination": denomination,
+            "confidence": top_prob,
             "prediction": {
                 "denomination":    denomination,
                 "title":           title,
@@ -914,8 +920,78 @@ def proxy_historial(subpath=""):
         return jsonify({"success": False, "error": f"Fallo comunicando con microservicio de historial: {str(e)}"}), 502
 
 
+def obtener_ngrok_url_local():
+    """Consulta la API de control de ngrok para obtener el túnel https activo."""
+    try:
+        req = urllib.request.Request("http://127.0.0.1:4040/api/tunnels", headers={"User-Agent": "BilletIA"})
+        with urllib.request.urlopen(req, timeout=2) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            for t in data.get("tunnels", []):
+                if t.get("proto") == "https" and t.get("public_url"):
+                    return t["public_url"].strip()
+    except Exception:
+        pass
+    return ""
+
+
+@app.route("/api/ngrok_url", methods=["GET"])
+def api_ngrok_url():
+    """Retorna la URL activa de ngrok para los clientes móviles."""
+    url = obtener_ngrok_url_local()
+    if not url:
+        txt = BASE_DIR / "ngrok_url.txt"
+        if txt.exists():
+            url = txt.read_text(encoding="utf-8").strip()
+    return jsonify({"success": True, "ngrok_url": url})
+
+
+def iniciar_sincronizador_ngrok():
+    """
+    Monitorea en segundo plano el túnel de ngrok y mantiene sincronizado
+    ngrok_url.txt, config.js y el repositorio de GitHub sin intervención del usuario.
+    """
+    def _worker():
+        last_url = ""
+        txt_path = BASE_DIR / "ngrok_url.txt"
+        if txt_path.exists():
+            try:
+                last_url = txt_path.read_text(encoding="utf-8").strip()
+            except Exception:
+                pass
+
+        while True:
+            try:
+                curr_url = obtener_ngrok_url_local()
+                if curr_url and curr_url != last_url:
+                    log.info(f"[Auto-Ngrok] Nuevo túnel detectado: {curr_url}")
+                    last_url = curr_url
+                    txt_path.write_text(curr_url, encoding="utf-8")
+
+                    config_js = BASE_DIR / "config.js"
+                    if config_js.exists():
+                        c = config_js.read_text(encoding="utf-8")
+                        c_new = re.sub(r'var NGROK_DEFAULT = ".*?";', f'var NGROK_DEFAULT = "{curr_url}";', c)
+                        config_js.write_text(c_new, encoding="utf-8")
+
+                    # Sincronizar automáticamente con GitHub
+                    try:
+                        subprocess.run(["git", "add", "ngrok_url.txt", "config.js"], cwd=str(BASE_DIR), capture_output=True, timeout=10)
+                        subprocess.run(["git", "commit", "-m", f"Auto-update ngrok URL: {curr_url}"], cwd=str(BASE_DIR), capture_output=True, timeout=10)
+                        subprocess.run(["git", "push", "origin", "main"], cwd=str(BASE_DIR), capture_output=True, timeout=20)
+                        log.info(f"[Auto-Ngrok] GitHub actualizado automáticamente con el túnel: {curr_url}")
+                    except Exception as gerr:
+                        log.warning(f"[Auto-Ngrok] Git push falló: {gerr}")
+            except Exception as e:
+                log.debug(f"[Auto-Ngrok] Error en ciclo: {e}")
+            time.sleep(15)
+
+    t = threading.Thread(target=_worker, daemon=True)
+    t.start()
+
+
 if __name__ == "__main__":
     asegurar_microservicio_historial()
+    iniciar_sincronizador_ngrok()
     load_model()
     print("\n" + "="*58)
     print("  >>> BilletIA / VisionCash Flask ->  http://localhost:5000")
