@@ -9,6 +9,14 @@ Servidor Flask para BilletIA - Versión PyTorch (RTX 5060 Ti / CUDA 12.8).
 ═══════════════════════════════════════════════════════════════════════════
 """
 
+import sys
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 import os
 import io
 import time
@@ -127,11 +135,62 @@ def _build_hue_centers(classes_dict):
     return centers
 
 
+def _auto_crop_and_orient_banknote(img_pil):
+    """
+    Detecta automáticamente el contorno del billete sobre la superficie (mesa/fondo),
+    lo recorta eliminando bordes innecesarios y lo orienta en posición HORIZONTAL.
+    """
+    try:
+        import cv2
+        cv_img = cv2.cvtColor(np.array(img_pil.convert("RGB")), cv2.COLOR_RGB2BGR)
+        img_h, img_w = cv_img.shape[:2]
+        total_area = img_h * img_w
+
+        gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+
+        best_crop = cv_img
+        # Búsqueda de contorno del billete por contraste
+        for thresh_val in [60, 75, 90, 110]:
+            _, thresh = cv2.threshold(blurred, thresh_val, 255, cv2.THRESH_BINARY)
+            contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+            found = False
+            for c in contours:
+                area = cv2.contourArea(c)
+                if 0.08 * total_area < area < 0.96 * total_area:
+                    x, y, w, h = cv2.boundingRect(c)
+                    if w > 60 and h > 60:
+                        pad_x = int(w * 0.02)
+                        pad_y = int(h * 0.02)
+                        x1 = max(0, x - pad_x)
+                        y1 = max(0, y - pad_y)
+                        x2 = min(img_w, x + w + pad_x)
+                        y2 = min(img_h, y + h + pad_y)
+                        best_crop = cv_img[y1:y2, x1:x2]
+                        found = True
+                        break
+            if found:
+                break
+
+        # Forzar orientación horizontal canónica (ancho > alto)
+        ch, cw = best_crop.shape[:2]
+        if ch > cw:
+            best_crop = cv2.rotate(best_crop, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+        rgb_crop = cv2.cvtColor(best_crop, cv2.COLOR_BGR2RGB)
+        return Image.fromarray(rgb_crop)
+    except Exception as e:
+        log.warning(f"Error en auto-recorte: {e}")
+        if img_pil.height > img_pil.width:
+            return img_pil.rotate(90, expand=True)
+        return img_pil
+
+
 def _detect_banknote_orientation(img_pil):
     """
-    Evalúa las 4 rotaciones posibles (0°, 90°, 180°, 270°) y selecciona
-    la orientación canónica que deja el billete HORIZONTAL y con la esquina
-    del número de denominación en la SUPERIOR IZQUIERDA.
+    Evalúa las rotaciones posibles y selecciona la orientación canónica que deja el
+    billete HORIZONTAL y con la esquina del número de denominación en la SUPERIOR IZQUIERDA.
     """
     candidates = []
     for rot in [0, 90, 180, 270]:
@@ -250,8 +309,11 @@ def tta_predict(img_pil):
     Auto-alineación canónica del billete + análisis de la esquina del número
     + inferencia profunda con TTA y calibración cromática.
     """
+    # 0. Recorte automático del billete y orientación horizontal canónica
+    cropped_img = _auto_crop_and_orient_banknote(img_pil)
+
     # 1. Auto-alinear billete para que quede horizontal y con el número en la esquina superior izquierda
-    best_angle, aligned_img = _detect_banknote_orientation(img_pil)
+    best_angle, aligned_img = _detect_banknote_orientation(cropped_img)
 
     # 2. Inferencia profunda con la orientación correcta + versión espejo
     variants = [
@@ -381,14 +443,14 @@ def api_predict():
         # Identificar origen para imprimir en la consola de Visual Studio
         client_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
         ua = request.headers.get("User-Agent", "").lower()
-        origen = "📱 CELULAR (App Android)" if ("okhttp" in ua or "android" in ua or "billetesapp" in ua) else "💻 PÁGINA WEB"
+        origen = "[CELULAR Android]" if ("okhttp" in ua or "android" in ua or "billetesapp" in ua) else "[WEB]"
 
-        print("\n" + "═"*64)
-        print(f"  🔔 [CLIENTE DETECTADO -> {origen}]")
-        print(f"  📡 IP: {client_ip} | Endpoint: {request.path}")
-        print(f"  💵 BILLETE: {denomination} ({character})")
-        print(f"  🎯 CONFIANZA: {top_pct}% | Latencia: {latency} ms | {HARDWARE_INFO}")
-        print("═"*64 + "\n", flush=True)
+        print("\n" + "="*62)
+        print(f"  >>> CLIENTE DETECTADO: {origen}")
+        print(f"  >>> IP: {client_ip} | Endpoint: {request.path}")
+        print(f"  >>> BILLETE: {denomination} ({character})")
+        print(f"  >>> CONFIANZA: {top_pct}% | Latencia: {latency} ms | {HARDWARE_INFO}")
+        print("="*62 + "\n", flush=True)
 
         return jsonify({
             "success": True,
@@ -495,16 +557,16 @@ def api_predict_burst():
         # Imprimir en consola de Visual Studio de forma destacada
         client_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
         ua = request.headers.get("User-Agent", "").lower()
-        origen = "📱 CELULAR (App Android)" if ("okhttp" in ua or "android" in ua or "billetesapp" in ua) else "💻 PÁGINA WEB"
+        origen = "[CELULAR Android]" if ("okhttp" in ua or "android" in ua or "billetesapp" in ua) else "[WEB]"
 
-        print("\n" + "═"*66)
-        print(f"  📸 [RÁFAGA MULTI-CAPTURA -> {len(images_bytes_list)} CUADROS DESDE {origen}]")
-        print(f"  📡 IP: {client_ip} | Consenso calculado en GPU ({HARDWARE_INFO})")
+        print("\n" + "="*66)
+        print(f"  >>> RAFAGA MULTI-CAPTURA ({len(images_bytes_list)} CUADROS) DESDE {origen}")
+        print(f"  >>> IP: {client_ip} | Consenso calculado en GPU ({HARDWARE_INFO})")
         for fd in frame_details:
-            print(f"     ├─ Cuadro {fd['frame']}: {fd['confidence_str']} -> {fd['denomination']} ({fd['character']})")
-        print(f"  🏆 CONSENSO FINAL: {final_denomination} ({final_character})")
-        print(f"  🎯 CONFIANZA COMBINADA: {final_top_pct}% | Latencia: {latency} ms")
-        print("═"*66 + "\n", flush=True)
+            print(f"     |-- Cuadro {fd['frame']}: {fd['confidence_str']} -> {fd['denomination']} ({fd['character']})")
+        print(f"  >>> CONSENSO FINAL: {final_denomination} ({final_character})")
+        print(f"  >>> CONFIANZA COMBINADA: {final_top_pct}% | Latencia: {latency} ms")
+        print("="*66 + "\n", flush=True)
 
         return jsonify({
             "success": True,
