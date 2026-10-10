@@ -1,0 +1,44 @@
+{
+  "0": {
+    "index": 0,
+    "raw_name": "10.000",
+    "denomination": "$10.000 COP",
+    "character": "Virginia Gutiérrez",
+    "color": "#ea580c"
+  },
+  "1": {
+    "index": 1,
+    "raw_name": "100.000",
+    "denomination": "$100.000 COP",
+    "character": "Carlos Lleras Restrepo",
+    "color": "#16a34a"
+  },
+  "2": {
+    "index": 2,
+    "raw_name": "2.000",
+    "denomination": "$2.000 COP",
+    "character": "Débora Arango",
+    "color": "#3b82f6"
+  },
+  "3": {
+    "index": 3,
+    "raw_name": "20.000",
+    "denomination": "$20.000 COP",
+    "character": "Alfonso López Michelsen",
+    "color": "#0d9488"
+  },
+  "4": {
+    "index": 4,
+    "raw_name": "5.000",
+    "denomination": "$5.000 COP",
+    "character": "José Asunción Silva",
+    "color": "#9333ea"
+  },
+  "5": {
+    "index": 5,
+    "raw_name": "50000",
+    "denomination": "$50.000 COP",
+    "character": "Gabriel García Márquez",
+    "color": "#2563eb"
+  }
+}
