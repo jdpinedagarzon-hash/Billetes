@@ -41,6 +41,7 @@ logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("BilletIA")
 
 app = Flask(__name__, static_folder=".", static_url_path="")
+app.config["MAX_CONTENT_LENGTH"] = 32 * 1024 * 1024
 CORS(app)
 
 @app.after_request
