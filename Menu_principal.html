@@ -1465,12 +1465,14 @@
 
     // 6. Integración con el Microservicio de Historial & Métricas
     var historyTbody = document.getElementById("historyTbody");
-    var MICROSERVICE_API = CONFIG.apiUrl("/api/historial");
+    function getMicroserviceApi() {
+      return CONFIG.apiUrl("/api/historial");
+    }
     var microserviceStatusBadge = document.getElementById("microserviceStatusBadge");
 
     function cargarMetricasMicroservicio() {
       var userParam = encodeURIComponent(currentUser || "");
-      fetch(MICROSERVICE_API + "/metricas?usuario=" + userParam)
+      fetch(getMicroserviceApi() + "/metricas?usuario=" + userParam)
         .then(function(res) { return res.json(); })
         .then(function(data) {
           if (data.success && data.resumen) {
@@ -1500,7 +1502,7 @@
 
     function cargarHistorial() {
       var userParam = encodeURIComponent(currentUser || "");
-      fetch(MICROSERVICE_API + "?limite=30&usuario=" + userParam)
+      fetch(getMicroserviceApi() + "?limite=30&usuario=" + userParam)
         .then(function(res) { return res.json(); })
         .then(function(data) {
           if (data.success && data.registros) {
@@ -1540,7 +1542,7 @@
 
     function saveScanToHistory(denom, conf, method, latencia) {
       // 1. Enviar al Microservicio de Historial (MySQL XAMPP)
-      fetch(MICROSERVICE_API, {
+      fetch(getMicroserviceApi(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1579,7 +1581,7 @@
     document.getElementById("btnClearHistory").addEventListener("click", function() {
       if (confirm("¿Deseas limpiar tu historial de escaneos en la base de datos?")) {
         var userParam = encodeURIComponent(currentUser || "");
-        fetch(MICROSERVICE_API + "/limpiar?usuario=" + userParam, { method: "DELETE" })
+        fetch(getMicroserviceApi() + "/limpiar?usuario=" + userParam, { method: "DELETE" })
           .then(function() {
             var storageKey = "billetia_scan_history_v2_" + (currentUser || "anon");
             localStorage.removeItem(storageKey);
@@ -1592,6 +1594,13 @@
     // Carga inicial desde el Microservicio
     cargarMetricasMicroservicio();
     cargarHistorial();
+
+    // Re-ejecutar automáticamente cuando el túnel ngrok sea auto-detectado o cambie
+    window.addEventListener("visioncash_backend_ready", function() {
+      checkAIStatus();
+      cargarMetricasMicroservicio();
+      cargarHistorial();
+    });
   </script>
 
 </body>
