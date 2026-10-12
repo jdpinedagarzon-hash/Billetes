@@ -1,20 +1,19 @@
-# VisionCash — Estructura del Proyecto
+# VisionCash — Reconocimiento Inteligente de Billetes Colombianos
 
-Sistema de reconocimiento de billetes colombianos para personas con discapacidad visual.
-Utiliza visión artificial (PyTorch EfficientNetV2-S) con interfaz web accesible y app Android.
+Sistema de reconocimiento de billetes colombianos con inteligencia artificial (PyTorch EfficientNetV2-S con GPU RTX 5060 Ti / CUDA 12.8), interfaz web accesible y aplicación móvil nativa Android para personas con discapacidad visual.
 
 ---
 
 ## Arquitectura de Carpetas
 
 ```
-visioncash/
+Lo que hay en google/
 │
 ├── presentacion/                  # Capa de Presentación (Interfaz de Usuario)
 │   ├── publico/                   # Archivos públicos descargables (APK, imágenes)
 │   │   ├── BilletesApp.apk        # App Android para personas con discapacidad visual
-│   │   ├── billetia-logo.png
-│   │   └── hero-bill-scan.png
+│   │   ├── billetia-logo.png      # Logo oficial
+│   │   └── hero-bill-scan.png     # Banner de portada
 │   │
 │   └── codigo_fuente/
 │       ├── componentes/
@@ -39,9 +38,9 @@ visioncash/
 │   ├── iniciar_servidor.py        # Servidor Flask principal (puerto 5000)
 │   ├── dependencias.txt           # requirements.txt del sistema
 │   └── aplicacion/
-│       ├── api/                   # Endpoints REST
-│       ├── logica_negocio/        # Procesamiento de imágenes y usuarios
-│       ├── integracion/           # Intermediarios externos
+│       ├── api/                   # Endpoints REST (rutas_reconocimiento, metricas, usuarios)
+│       ├── logica_negocio/        # Procesamiento de imágenes (OpenCV) y gestión de usuarios
+│       ├── integracion/           # Intermediarios de autenticación
 │       └── modelos_db/            # Esquemas de datos
 │
 ├── motor_ia/                      # Capa de IA (Entrenamiento y Modelos)
@@ -51,8 +50,9 @@ visioncash/
 │   ├── entrenamiento/
 │   │   ├── train.py               # Script de entrenamiento con CUDA
 │   │   └── run_pipeline.bat       # Pipeline completo: augment → train
-│   └── utilidades_imagenes/
-│       └── augment.py             # Augmentación de dataset de imágenes
+│   ├── utilidades_imagenes/
+│   │   └── augment.py             # Augmentación de dataset de imágenes
+│   └── augmented_dataset/         # Dataset procesado por clases
 │
 ├── capa_datos/                    # Capa de Datos (Base de Datos)
 │   ├── base_de_datos/
@@ -62,39 +62,41 @@ visioncash/
 │   └── almacenamiento_imagenes/
 │       └── README.md
 │
-└── componentes_transversales/     # Componentes Compartidos y Configuración
-    ├── configuracion/
-    │   ├── iniciar_servicios.bat  # Script de inicio de todos los servicios
-    │   ├── actualizar_ngrok.bat   # Actualización manual de URL ngrok
-    │   ├── actualizar_ngrok.ps1   # Actualización ngrok en PowerShell
-    │   └── ngrok_url.txt          # URL activa del túnel ngrok (auto-actualizada)
-    ├── monitoreo/
-    │   └── microservicio_historial.py  # Microservicio de historial (puerto 5001)
-    ├── respaldos/
-    │   └── backup_bd.py           # Script de respaldo de la base de datos
-    └── seguridad/
-        └── autenticacion_seguridad.py  # Utilidades de seguridad y autenticación
+├── componentes_transversales/     # Componentes Compartidos y Configuración
+│   ├── configuracion/
+│   │   ├── iniciar_servicios.bat  # Script de inicio de todos los servicios
+│   │   ├── actualizar_ngrok.bat   # Actualización manual de URL ngrok
+│   │   ├── actualizar_ngrok.ps1   # Actualización ngrok en PowerShell
+│   │   └── ngrok_url.txt          # URL activa del túnel ngrok (auto-actualizada)
+│   ├── monitoreo/
+│   │   └── microservicio_historial.py  # Microservicio de historial (puerto 5001)
+│   ├── respaldos/
+│   │   └── backup_bd.py           # Script de respaldo de la base de datos
+│   └── seguridad/
+│       └── autenticacion_seguridad.py  # Utilidades de seguridad y autenticación
+│
+└── documentacion/                 # Documentación Técnica Integral
+    └── Documentacion_Tecnica_VisionCash_Arquitectura_y_APIs.docx
 ```
 
 ---
 
-## Como Iniciar el Sistema
+## Cómo Iniciar el Sistema
 
-### Opcion 1 — Script automatico (recomendado)
-```
+### Opción 1 — Script automático (recomendado)
+```cmd
 Doble clic en:
-visioncash\componentes_transversales\configuracion\iniciar_servicios.bat
+componentes_transversales\configuracion\iniciar_servicios.bat
 ```
-Esto inicia automaticamente:
+Esto inicia automáticamente:
 1. Microservicio de historial (puerto 5001)
 2. Servidor Flask + IA (puerto 5000)
-3. Tunel ngrok (actualizacion automatica cada 15s en GitHub)
+3. Túnel ngrok (actualización automática cada 15s en GitHub)
 
-### Opcion 2 — Manual
+### Opción 2 — Manual desde la raíz (`Lo que hay en google\`):
 ```bash
-# Desde la raiz del proyecto (Lo que hay en google\)
-python visioncash\servicios_backend\iniciar_servidor.py
-python visioncash\componentes_transversales\monitoreo\microservicio_historial.py
+python componentes_transversales\monitoreo\microservicio_historial.py
+python servicios_backend\iniciar_servidor.py
 ngrok.exe http 5000
 ```
 
@@ -105,29 +107,8 @@ ngrok.exe http 5000
 | Servicio | URL |
 |---|---|
 | App Web Local | http://localhost:5000/Menu_principal.html |
-| GitHub Pages (publico) | https://jdpinedagarzon-hash.github.io/Billetes/ |
-| API Estado | http://localhost:5000/api/status |
-| Historial / KPIs | http://localhost:5001/api/historial/metricas |
-| Base de Datos (XAMPP) | http://192.168.0.12/phpmyadmin/ |
-
----
-
-## App Android
-
-La aplicacion BilletesApp.apk en presentacion/publico/ esta disenada para personas con discapacidad visual:
-- Detecta el billete automaticamente sin necesidad de tocar pantalla
-- Anuncia el resultado por voz (Text-to-Speech)
-- Obtiene la URL del servidor automaticamente desde GitHub (no requiere configuracion manual)
-
----
-
-## Tecnologias
-
-| Componente | Tecnologia |
-|---|---|
-| Modelo IA | PyTorch - EfficientNetV2-S - CUDA 12.8 |
-| Backend | Python - Flask - Flask-CORS |
-| Base de Datos | MySQL (XAMPP) - PyMySQL |
-| Autenticacion 2FA | pyotp (TOTP RFC 6238) - Google Authenticator |
-| Acceso remoto | ngrok (tunel HTTPS) - GitHub Pages |
-| App Movil | Android (Kotlin) - CameraX - OkHttp |
+| Landing Informativa | http://localhost:5000/index.html |
+| Mesa de Ayuda & KPIs | http://localhost:5000/Soporte.html |
+| API Estado del Servidor | http://localhost:5000/api/status |
+| Microservicio Historial | http://localhost:5001/api/historial/metricas |
+| Descarga de APK | http://localhost:5000/BilletesApp.apk |

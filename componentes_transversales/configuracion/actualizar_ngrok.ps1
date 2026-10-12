@@ -51,24 +51,30 @@ Write-Host "[OK] URL publica de ngrok detectada: $publicUrl" -ForegroundColor Gr
 
 # 3. Guardar en ngrok_url.txt
 $utf8 = New-Object System.Text.UTF8Encoding $false
-[System.IO.File]::WriteAllText("$projectDir\ngrok_url.txt", $publicUrl, $utf8)
+$ngrokTxtPath = "$projectDir\componentes_transversales\configuracion\ngrok_url.txt"
+[System.IO.File]::WriteAllText($ngrokTxtPath, $publicUrl, $utf8)
 Write-Host "[OK] ngrok_url.txt actualizado con la nueva URL." -ForegroundColor Green
 
 # 4. Actualizar config.js
-$configJsPath = "$projectDir\config.js"
-if (Test-Path $configJsPath) {
-    $content = [System.IO.File]::ReadAllText($configJsPath)
-    $pattern = 'var NGROK_DEFAULT = ".*?";'
-    $replacement = 'var NGROK_DEFAULT = "' + $publicUrl + '";'
-    $newContent = [System.Text.RegularExpressions.Regex]::Replace($content, $pattern, $replacement)
-    [System.IO.File]::WriteAllText($configJsPath, $newContent, $utf8)
-    Write-Host "[OK] config.js actualizado." -ForegroundColor Green
+$configPaths = @(
+    "$projectDir\presentacion\codigo_fuente\servicios_api\config.js",
+    "$projectDir\presentacion\codigo_fuente\vistas\config.js"
+)
+foreach ($cfg in $configPaths) {
+    if (Test-Path $cfg) {
+        $content = [System.IO.File]::ReadAllText($cfg)
+        $pattern = 'var NGROK_DEFAULT = ".*?";'
+        $replacement = 'var NGROK_DEFAULT = "' + $publicUrl + '";'
+        $newContent = [System.Text.RegularExpressions.Regex]::Replace($content, $pattern, $replacement)
+        [System.IO.File]::WriteAllText($cfg, $newContent, $utf8)
+        Write-Host "[OK] config.js actualizado: $cfg" -ForegroundColor Green
+    }
 }
 
 # 5. Subir a GitHub
 Write-Host ""
 Write-Host "[*] Sincronizando con GitHub..." -ForegroundColor Cyan
-git add ngrok_url.txt config.js
+git add componentes_transversales/configuracion/ngrok_url.txt presentacion/codigo_fuente/servicios_api/config.js presentacion/codigo_fuente/vistas/config.js
 $commitMsg = "Auto-update ngrok URL: " + $publicUrl
 git commit -m $commitMsg
 git push origin main

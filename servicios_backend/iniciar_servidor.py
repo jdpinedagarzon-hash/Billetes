@@ -52,9 +52,16 @@ def after_request_cors(response):
     response.headers["ngrok-skip-browser-warning"] = "true"
     return response
 
-BASE_DIR     = Path(__file__).parent.resolve()
-MODEL_PATH   = BASE_DIR / "models" / "banknote_efficientnetv2s.pt"
-CLASSES_PATH = BASE_DIR / "models" / "classes.json"
+# Raíz del proyecto (Lo que hay en google/)
+BASE_DIR     = Path(__file__).resolve().parent.parent
+# Rutas de la estructura organizada
+MODEL_PATH   = BASE_DIR / "motor_ia" / "modelos_entrenados" / "banknote_efficientnetv2s.pt"
+CLASSES_PATH = BASE_DIR / "motor_ia" / "modelos_entrenados" / "classes.json"
+CONFIG_JS_PATH = BASE_DIR / "presentacion" / "codigo_fuente" / "servicios_api" / "config.js"
+CONFIG_JS_VISTAS_PATH = BASE_DIR / "presentacion" / "codigo_fuente" / "vistas" / "config.js"
+NGROK_TXT_PATH = BASE_DIR / "componentes_transversales" / "configuracion" / "ngrok_url.txt"
+VISTAS_DIR   = BASE_DIR / "presentacion" / "codigo_fuente" / "vistas"
+PUBLICO_DIR  = BASE_DIR / "presentacion" / "publico"
 
 MODEL        = None
 CLASSES      = {}
@@ -354,11 +361,30 @@ def tta_predict(img_pil):
 
 @app.route("/")
 def index():
-    f = BASE_DIR / "Menu_principal.html"
-    return send_from_directory(str(BASE_DIR), f.name if f.exists() else "index.html")
+    f = VISTAS_DIR / "Menu_principal.html"
+    if f.exists():
+        return send_from_directory(str(VISTAS_DIR), "Menu_principal.html")
+    return send_from_directory(str(VISTAS_DIR), "index.html")
 
 @app.route("/<path:path>")
 def static_proxy(path):
+    # 1. Vistas HTML
+    p_vista = VISTAS_DIR / path
+    if p_vista.exists() and p_vista.is_file():
+        return send_from_directory(str(VISTAS_DIR), path)
+    # 2. Publico (APK, logos, imagenes)
+    p_pub = PUBLICO_DIR / path
+    if p_pub.exists() and p_pub.is_file():
+        return send_from_directory(str(PUBLICO_DIR), path)
+    # 3. Servicios API (config.js)
+    p_api = BASE_DIR / "presentacion" / "codigo_fuente" / "servicios_api" / path
+    if p_api.exists() and p_api.is_file():
+        return send_from_directory(str(p_api.parent), path)
+    # 4. Utilidades (sesion.js)
+    p_ut = BASE_DIR / "presentacion" / "codigo_fuente" / "utilidades" / path
+    if p_ut.exists() and p_ut.is_file():
+        return send_from_directory(str(p_ut.parent), path)
+    # 5. Fallback en BASE_DIR
     fp = BASE_DIR / path
     if fp.exists() and fp.is_file():
         return send_from_directory(str(BASE_DIR), path)
@@ -604,6 +630,11 @@ import hashlib
 import random
 import pyotp
 import qrcode
+# Importar conexion_bd desde su nueva ubicación en la estructura organizada
+import sys as _sys
+_bd_path = str(VC_DIR / "capa_datos" / "base_de_datos")
+if _bd_path not in _sys.path:
+    _sys.path.insert(0, _bd_path)
 from conexion_bd import obtener_conexion, probar_conexion
 
 
@@ -1048,10 +1079,10 @@ def asegurar_microservicio_historial():
         pass
 
     try:
-        script = BASE_DIR / "microservicio_historial.py"
+        script = BASE_DIR / "componentes_transversales" / "monitoreo" / "microservicio_historial.py"
         if script.exists():
             log.info("[Auto-Recuperación] Microservicio 5001 apagado. Iniciando automáticamente...")
-            subprocess.Popen([sys.executable, str(script)], cwd=str(BASE_DIR))
+            subprocess.Popen([sys.executable, str(script)], cwd=str(script.parent))
             time.sleep(2.0)
             return True
     except Exception as ex:
@@ -1129,7 +1160,9 @@ def api_ngrok_url():
     """Retorna la URL activa de ngrok para los clientes móviles."""
     url = obtener_ngrok_url_local()
     if not url:
-        txt = BASE_DIR / "ngrok_url.txt"
+        txt = NGROK_TXT_PATH
+        if not txt.exists():
+            txt = BASE_DIR / "ngrok_url.txt"
         if txt.exists():
             url = txt.read_text(encoding="utf-8").strip()
     return jsonify({"success": True, "ngrok_url": url})
@@ -1142,7 +1175,8 @@ def iniciar_sincronizador_ngrok():
     """
     def _worker():
         last_url = ""
-        txt_path = BASE_DIR / "ngrok_url.txt"
+        # Usar la nueva ubicación organizada; fallback a raíz por compatibilidad
+        txt_path = NGROK_TXT_PATH
         if txt_path.exists():
             try:
                 last_url = txt_path.read_text(encoding="utf-8").strip()
@@ -1157,15 +1191,21 @@ def iniciar_sincronizador_ngrok():
                     last_url = curr_url
                     txt_path.write_text(curr_url, encoding="utf-8")
 
-                    config_js = BASE_DIR / "config.js"
-                    if config_js.exists():
-                        c = config_js.read_text(encoding="utf-8")
-                        c_new = re.sub(r'var NGROK_DEFAULT = ".*?";', f'var NGROK_DEFAULT = "{curr_url}";', c)
-                        config_js.write_text(c_new, encoding="utf-8")
+                    # Actualizar config.js en ambas ubicaciones organizadas
+                    for c_path in [CONFIG_JS_PATH, CONFIG_JS_VISTAS_PATH]:
+                        if c_path.exists():
+                            c = c_path.read_text(encoding="utf-8")
+                            c_new = re.sub(r'var NGROK_DEFAULT = ".*?";', f'var NGROK_DEFAULT = "{curr_url}";', c)
+                            c_path.write_text(c_new, encoding="utf-8")
+                            log.info(f"[Auto-Ngrok] config.js actualizado: {c_path}")
 
                     # Sincronizar automáticamente con GitHub
                     try:
-                        subprocess.run(["git", "add", "ngrok_url.txt", "config.js"], cwd=str(BASE_DIR), capture_output=True, timeout=10)
+                        subprocess.run(["git", "add",
+                                        "componentes_transversales/configuracion/ngrok_url.txt",
+                                        "presentacion/codigo_fuente/servicios_api/config.js",
+                                        "presentacion/codigo_fuente/vistas/config.js"],
+                                       cwd=str(BASE_DIR), capture_output=True, timeout=10)
                         subprocess.run(["git", "commit", "-m", f"Auto-update ngrok URL: {curr_url}"], cwd=str(BASE_DIR), capture_output=True, timeout=10)
                         subprocess.run(["git", "push", "origin", "main"], cwd=str(BASE_DIR), capture_output=True, timeout=20)
                         log.info(f"[Auto-Ngrok] GitHub actualizado automáticamente con el túnel: {curr_url}")

@@ -9,18 +9,18 @@ echo [*] Conectando a Base de Datos MySQL en XAMPP (192.168.0.12:3306)...
 echo.
 
 REM Ir a la raiz del proyecto (Lo que hay en google\)
-cd /d "%~dp0..\..\..\"
+cd /d "%~dp0..\..\"
 
 echo Directorio de trabajo: %CD%
 echo.
 
 echo [1/3] Levantando Microservicio de Historial y Metricas en Puerto 5001...
-start "VisionCash - Microservicio Historial [Puerto 5001]" cmd /k "python visioncash\componentes_transversales\monitoreo\microservicio_historial.py"
+start "VisionCash - Microservicio Historial [Puerto 5001]" cmd /k "python componentes_transversales\monitoreo\microservicio_historial.py"
 
 timeout /t 2 /nobreak >nul
 
 echo [2/3] Levantando Servidor Principal Flask e IA en Puerto 5000...
-start "VisionCash - Servidor Principal e IA [Puerto 5000]" cmd /k "python visioncash\servicios_backend\iniciar_servidor.py"
+start "VisionCash - Servidor Principal e IA [Puerto 5000]" cmd /k "python servicios_backend\iniciar_servidor.py"
 
 timeout /t 3 /nobreak >nul
 
