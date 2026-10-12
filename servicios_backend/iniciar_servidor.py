@@ -40,18 +40,6 @@ from flask_cors import CORS
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("BilletIA")
 
-app = Flask(__name__, static_folder=".", static_url_path="")
-app.config["MAX_CONTENT_LENGTH"] = 32 * 1024 * 1024
-CORS(app)
-
-@app.after_request
-def after_request_cors(response):
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["ngrok-skip-browser-warning"] = "true"
-    return response
-
 # Raíz del proyecto (Lo que hay en google/)
 BASE_DIR     = Path(__file__).resolve().parent.parent
 VC_DIR       = BASE_DIR
@@ -63,6 +51,18 @@ CONFIG_JS_VISTAS_PATH = BASE_DIR / "presentacion" / "codigo_fuente" / "vistas" /
 NGROK_TXT_PATH = BASE_DIR / "componentes_transversales" / "configuracion" / "ngrok_url.txt"
 VISTAS_DIR   = BASE_DIR / "presentacion" / "codigo_fuente" / "vistas"
 PUBLICO_DIR  = BASE_DIR / "presentacion" / "publico"
+
+app = Flask(__name__, static_folder=str(BASE_DIR), static_url_path="")
+app.config["MAX_CONTENT_LENGTH"] = 32 * 1024 * 1024
+CORS(app)
+
+@app.after_request
+def after_request_cors(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["ngrok-skip-browser-warning"] = "true"
+    return response
 
 MODEL        = None
 CLASSES      = {}
