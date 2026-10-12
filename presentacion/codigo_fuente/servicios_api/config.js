@@ -198,45 +198,60 @@ var CONFIG = (function() {
   }
 
   function consultarGitHubParaNgrok(onListo) {
-    var rawUrl = GITHUB_RAW_URL + "?nocache=" + Date.now();
-
-    // Intentar GitHub Raw con bypass de caché
-    originalFetch(rawUrl, {
-      headers: { "Cache-Control": "no-cache" }
+    // 1. GitHub API (sin caché CDN, respuesta instantánea y real-time)
+    originalFetch(GITHUB_API_URL, {
+      headers: { "Accept": "application/vnd.github.v3+json" }
     })
-      .then(function(res) {
-        if (!res.ok) throw new Error("GitHub Raw " + res.status);
-        return res.text();
-      })
-      .then(function(texto) {
-        var candidata = (texto || "").trim();
-        if (candidata.startsWith("http")) {
-          probarYCerrar(candidata, onListo);
-        } else {
-          throw new Error("Contenido inválido en raw");
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data && data.content) {
+          var dec = atob(data.content.replace(/\s+/g, "")).trim();
+          if (dec.startsWith("http")) {
+            probarYCerrar(dec, onListo);
+            return;
+          }
         }
+        throw new Error("No URL en GitHub API");
       })
       .catch(function() {
-        // Fallback a GitHub REST API (libre de CDN Fastly)
-        originalFetch(GITHUB_API_URL, {
-          headers: { "Accept": "application/vnd.github.v3+json" }
-        })
-          .then(function(res) { return res.json(); })
-          .then(function(data) {
-            if (data && data.content) {
-              var dec = atob(data.content.replace(/\s+/g, "")).trim();
-              if (dec.startsWith("http")) {
-                probarYCerrar(dec, onListo);
-                return;
-              }
+        // 2. GitHub Pages directo (mismo dominio, sin CORS, actualiza rápido)
+        var gpUrl = window.location.origin + "/ngrok_url.txt?t=" + Date.now();
+        originalFetch(gpUrl)
+          .then(function(res) {
+            if (!res.ok) throw new Error("GP " + res.status);
+            return res.text();
+          })
+          .then(function(texto) {
+            var candidata = (texto || "").trim();
+            if (candidata.startsWith("http")) {
+              probarYCerrar(candidata, onListo);
+            } else {
+              throw new Error("Contenido inválido en GP");
             }
-            throw new Error("No URL en GitHub API");
           })
           .catch(function() {
-            resolucionEnProgreso = false;
-            actualizarWidgetEstado("desconectado", "ngrok Desconectado (Reintentando...)");
-            // Reintentar automáticamente cada 3.5 segundos
-            setTimeout(function() { autoDetectarNgrok(onListo); }, 3500);
+            // 3. GitHub Raw (puede tener caché de hasta 5 min)
+            var rawUrl = GITHUB_RAW_URL + "?nocache=" + Date.now();
+            originalFetch(rawUrl, {
+              headers: { "Cache-Control": "no-cache" }
+            })
+              .then(function(res) {
+                if (!res.ok) throw new Error("GitHub Raw " + res.status);
+                return res.text();
+              })
+              .then(function(texto) {
+                var candidata = (texto || "").trim();
+                if (candidata.startsWith("http")) {
+                  probarYCerrar(candidata, onListo);
+                } else {
+                  throw new Error("Contenido inválido en raw");
+                }
+              })
+              .catch(function() {
+                resolucionEnProgreso = false;
+                actualizarWidgetEstado("desconectado", "ngrok Desconectado (Reintentando...)");
+                setTimeout(function() { autoDetectarNgrok(onListo); }, 3500);
+              });
           });
       });
   }

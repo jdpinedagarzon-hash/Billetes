@@ -1192,8 +1192,11 @@ def iniciar_sincronizador_ngrok():
                     log.info(f"[Auto-Ngrok] Nuevo túnel detectado: {curr_url}")
                     last_url = curr_url
                     txt_path.write_text(curr_url, encoding="utf-8")
+                    # También escribir en la raíz (GitHub Pages lo busca ahí)
+                    root_txt = BASE_DIR / "ngrok_url.txt"
+                    root_txt.write_text(curr_url, encoding="utf-8")
 
-                    # Actualizar config.js en ambas ubicaciones organizadas
+                    # Actualizar config.js en todas las ubicaciones
                     for c_path in [CONFIG_JS_PATH, CONFIG_JS_VISTAS_PATH, CONFIG_JS_ROOT_PATH]:
                         if c_path.exists():
                             c = c_path.read_text(encoding="utf-8")
@@ -1204,6 +1207,7 @@ def iniciar_sincronizador_ngrok():
                     # Sincronizar automáticamente con GitHub
                     try:
                         subprocess.run(["git", "add",
+                                        "ngrok_url.txt",
                                         "componentes_transversales/configuracion/ngrok_url.txt",
                                         "presentacion/codigo_fuente/servicios_api/config.js",
                                         "presentacion/codigo_fuente/vistas/config.js",
