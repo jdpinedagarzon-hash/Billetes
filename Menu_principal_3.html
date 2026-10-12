@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VisionCash · Registrarse</title>
+<meta name="description" content="Crea tu cuenta en VisionCash y comienza a reconocer billetes colombianos con inteligencia artificial." />
+<style>
+  :root {
+    --navy-900: #0a1633;
+    --navy-800: #0d1b3e;
+    --navy-700: #10214a;
+    --blue: #2f7bff;
+    --blue-bright: #3b82f6;
+    --purple: #6d3bf5;
+    --teal: #14b8a6;
+    --amber: #f5b13b;
+    --page-bg: #eef1f8;
+    --card: #ffffff;
+    --text-dark: #1e2a52;
+    --text-muted: #55608a;
+    --ok: #14b8a6;
+    --danger: #ef4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--page-bg);
+    color: var(--text-dark);
+    line-height: 1.5;
+  }
+
+  a { text-decoration: none; color: inherit; }
+
+  .container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* ===== Header ===== */
+  .site-header {
+    background: linear-gradient(180deg, #0b1838 0%, #0d1c40 100%);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .brand img { width: 74px; height: 74px; object-fit: contain; }
+  .brand-name {
+    font-size: 30px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .brand-name .ia { color: var(--blue-bright); }
+  .brand-tagline {
+    font-size: 15px;
+    color: #b9c3e0;
+    margin-top: 2px;
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+  .nav a { color: #dbe2f5; font-size: 17px; font-weight: 500; }
+  .nav a:hover { color: #fff; }
+  .nav .pill {
+    background: linear-gradient(90deg, var(--blue) 0%, var(--purple) 100%);
+    color: #fff;
+    padding: 13px 26px;
+    border-radius: 999px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(60,90,240,0.4);
+  }
+
+  /* ===== Main ===== */
+  main { padding: 40px 0 10px; }
+
+  /* ===== Hero ===== */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 22px;
+    background:
+      radial-gradient(120% 120% at 85% 20%, rgba(109,59,245,0.55) 0%, rgba(13,27,64,0) 55%),
+      linear-gradient(120deg, #0b1838 0%, #14204d 55%, #241a5c 100%);
+    padding: 48px 64px;
+    margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-size: 42px;
+    line-height: 1.1;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -1px;
+  }
+  .hero p {
+    margin-top: 16px;
+    max-width: 720px;
+    font-size: 17px;
+    color: #c9d2ec;
+    line-height: 1.65;
+  }
+
+  /* ===== Register Layout ===== */
+  .registro-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px;
+    align-items: start;
+    padding-bottom: 60px;
+  }
+
+  .form-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 36px 32px;
+    box-shadow: 0 12px 30px rgba(30,42,82,0.08);
+    border: 1px solid rgba(47,123,255,0.08);
+  }
+  .form-title {
+    font-size: 28px;
+    line-height: 1.15;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+  .form-subtitle {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+    line-height: 1.6;
+  }
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .input-block { margin-bottom: 14px; }
+  .input-block label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-dark);
+  }
+  .input-wrap { position: relative; }
+  .input {
+    width: 100%;
+    height: 46px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(47,123,255,0.2);
+    background: #f6f8ff;
+    padding: 0 14px;
+    font-size: 14px;
+    color: var(--text-dark);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    font-family: inherit;
+  }
+  .input::placeholder { color: #94a3b8; }
+  .input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(47,123,255,0.15);
+    background: #fff;
+  }
+  .input.has-icon { padding-right: 42px; }
+  .toggle-pass {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    color: #6b7280;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .input-error {
+    font-size: 12px;
+    color: var(--danger);
+    margin-top: 6px;
+    display: none;
+  }
+  .input-error.show { display: block; }
+  .input.invalid {
+    border-color: #fca5a5;
+    box-shadow: 0 0 0 3px rgba(252, 165, 165, 0.2);
+    background: #fff;
+  }
+  .submit-btn {
+    width: 100%;
+    height: 46px;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--blue) 0%, var(--purple) 100%);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 8px 20px rgba(60,90,240,0.4);
+    margin-top: 4px;
+    font-family: inherit;
+  }
+  .submit-btn:hover:enabled {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(60,90,240,0.5);
+  }
+  .submit-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .auth-links {
+    margin-top: 14px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .auth-links a {
+    color: var(--blue);
+    font-weight: 600;
+  }
+  .auth-links a:hover { color: var(--purple); }
+  #registroErrorMsg {
+    margin-top: 12px;
+    border-radius: 10px;
+    border: 1px solid #fecaca;
+    background: #fff1f2;
+    color: #9f1239;
+    font-size: 13px;
+    padding: 10px 12px;
+    display: none;
+  }
+
+  /* ===== Rules Cards ===== */
+  .rules-column {
+    display: grid;
+    gap: 18px;
+  }
+  .rules-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 12px 30px rgba(30,42,82,0.08);
+    border: 1px solid rgba(47,123,255,0.08);
+  }
+  .rules-card h3 {
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--text-dark);
+  }
+  .rule-list { list-style: none; display: grid; gap: 10px; }
+  .rule-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .rule-icon {
+    width: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #9ca3af;
+  }
+  .rule-item.valid .rule-icon { color: var(--ok); }
+  .rule-item.valid .rule-text { color: var(--text-dark); }
+
+  /* ===== Footer ===== */
+  .site-footer {
+    background: linear-gradient(180deg, #0c1a3d 0%, #0a1430 100%);
+    color: #c4cdea;
+    padding: 56px 0 0;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: 50px;
+    padding-bottom: 44px;
+  }
+  .footer-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+  .footer-brand img { width: 62px; height: 62px; object-fit: contain; }
+  .footer-brand .brand-name { font-size: 26px; }
+  .footer-brand .brand-tagline { font-size: 13px; }
+  .footer-col p { font-size: 15.5px; line-height: 1.7; color: #aab5d8; }
+  .footer-col h4 {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+  .footer-links li { display: flex; align-items: center; gap: 12px; }
+  .footer-links svg { width: 20px; height: 20px; stroke: #6f8bff; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+  .footer-links a { color: #aab5d8; }
+  .footer-links a:hover { color: #fff; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    padding: 24px 0;
+    font-size: 15px;
+    color: #9aa6cc;
+  }
+  .footer-bar { height: 8px; background: linear-gradient(90deg, #2f7bff 0%, #6d3bf5 100%); }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 1000px) {
+    .header-inner { flex-direction: column; gap: 18px; padding: 20px; }
+    .nav { gap: 20px; flex-wrap: wrap; justify-content: center; }
+    .registro-layout { grid-template-columns: 1fr; }
+    .hero { padding: 36px 32px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 720px) {
+    .container { padding: 0 20px; }
+    .hero h1 { font-size: 32px; }
+    .form-grid-2 { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; gap: 34px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <img src="billetia-logo.png" alt="Logo de VisionCash" />
+        <div>
+          <div class="brand-name">Vision<span class="ia">Cash</span></div>
+          <div class="brand-tagline">Reconoce &middot; Analiza &middot; Confiable</div>
+        </div>
+      </a>
+      <nav class="nav" aria-label="Navegaci&oacute;n principal">
+        <a href="index.html">Inicio</a>
+        <a href="acerca_nosotros.html">Acerca de nosotros</a>
+        <a href="Contacto.html">Contacto</a>
+        <a href="Menu_principal_2.html">Iniciar sesi&oacute;n</a>
+        <a href="Menu_principal_3.html" class="pill">Registrarse</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main>
+    <div class="container">
+
+      <!-- Hero -->
+      <section class="hero">
+        <h1>Crea tu cuenta en VisionCash</h1>
+        <p>Completa tus datos para registrarte y empieza a reconocer billetes con IA. Te mostraremos validaciones en tiempo real para que el registro sea r&aacute;pido y claro.</p>
+      </section>
+
+      <!-- Register Form -->
+      <section class="registro-layout">
+        <article class="form-card">
+          <h2 class="form-title">Crear cuenta</h2>
+          <p class="form-subtitle">Ingresa tus datos para registrarte en VisionCash</p>
+
+          <form id="registroForm" action="#" method="post" novalidate>
+            <div class="form-grid-2">
+              <div class="input-block">
+                <label for="nombre">Nombre</label>
+                <div class="input-wrap">
+                  <input class="input" type="text" id="nombre" name="nombre" placeholder="Juan" required />
+                </div>
+                <p class="input-error" id="err-nombre">M&iacute;nimo 2 caracteres</p>
+              </div>
+              <div class="input-block">
+                <label for="apellido">Apellido</label>
+                <div class="input-wrap">
+                  <input class="input" type="text" id="apellido" name="apellido" placeholder="P&eacute;rez" required />
+                </div>
+                <p class="input-error" id="err-apellido">M&iacute;nimo 2 caracteres</p>
+              </div>
+            </div>
+
+            <div class="input-block">
+              <label for="usuario">Nombre de usuario</label>
+              <div class="input-wrap">
+                <input class="input" type="text" id="usuario" name="username" placeholder="Usuario1" required />
+              </div>
+            </div>
+
+            <div class="input-block">
+              <label for="correo">Correo electr&oacute;nico</label>
+              <div class="input-wrap">
+                <input class="input" type="email" id="correo" name="correo" placeholder="ejemplo@correo.com" required />
+              </div>
+            </div>
+
+            <div class="input-block">
+              <label for="password">Contrase&ntilde;a</label>
+              <div class="input-wrap">
+                <input class="input has-icon" type="password" id="password" name="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required />
+                <button class="toggle-pass" type="button" id="togglePassword" aria-label="Mostrar contrase&ntilde;a">&#128065;</button>
+              </div>
+            </div>
+
+            <div class="input-block">
+              <label for="password2">Confirmar contrase&ntilde;a</label>
+              <div class="input-wrap">
+                <input class="input has-icon" type="password" id="password2" name="password2" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required />
+                <button class="toggle-pass" type="button" id="togglePassword2" aria-label="Mostrar contrase&ntilde;a">&#128065;</button>
+              </div>
+              <p class="input-error" id="err-password2">Las contrase&ntilde;as no coinciden</p>
+            </div>
+
+            <button class="submit-btn" id="submitBtn" type="submit" disabled>Crear cuenta</button>
+            <p id="registroErrorMsg"></p>
+
+            <p class="auth-links">&iquest;Ya tienes cuenta? <a href="Menu_principal_2.html">Iniciar sesi&oacute;n</a></p>
+          </form>
+        </article>
+
+        <aside class="rules-column">
+          <article class="rules-card">
+            <h3>Requisitos de usuario</h3>
+            <ul class="rule-list">
+              <li class="rule-item" id="rule-user-min"><span class="rule-icon">&times;</span><span class="rule-text">M&iacute;nimo 4 caracteres</span></li>
+              <li class="rule-item" id="rule-user-upper"><span class="rule-icon">&times;</span><span class="rule-text">Al menos una letra may&uacute;scula</span></li>
+              <li class="rule-item" id="rule-user-number"><span class="rule-icon">&times;</span><span class="rule-text">Al menos un n&uacute;mero</span></li>
+            </ul>
+          </article>
+
+          <article class="rules-card">
+            <h3>Requisitos de contrase&ntilde;a</h3>
+            <ul class="rule-list">
+              <li class="rule-item" id="rule-pass-min"><span class="rule-icon">&times;</span><span class="rule-text">M&iacute;nimo 8 caracteres</span></li>
+              <li class="rule-item" id="rule-pass-upper"><span class="rule-icon">&times;</span><span class="rule-text">Al menos una letra may&uacute;scula</span></li>
+              <li class="rule-item" id="rule-pass-lower"><span class="rule-icon">&times;</span><span class="rule-text">Al menos una letra min&uacute;scula</span></li>
+              <li class="rule-item" id="rule-pass-number"><span class="rule-icon">&times;</span><span class="rule-text">Al menos un n&uacute;mero</span></li>
+              <li class="rule-item" id="rule-pass-symbol"><span class="rule-icon">&times;</span><span class="rule-text">Al menos un s&iacute;mbolo especial</span></li>
+            </ul>
+          </article>
+
+          <article class="rules-card">
+            <h3>Requisitos de correo</h3>
+            <ul class="rule-list">
+              <li class="rule-item" id="rule-mail-at"><span class="rule-icon">&times;</span><span class="rule-text">Debe contener @</span></li>
+              <li class="rule-item" id="rule-mail-com"><span class="rule-icon">&times;</span><span class="rule-text">Debe terminar en .com</span></li>
+            </ul>
+          </article>
+        </aside>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-brand">
+            <img src="billetia-logo.png" alt="Logo de VisionCash" />
+            <div>
+              <div class="brand-name">Vision<span class="ia" style="color:var(--blue-bright)">Cash</span></div>
+              <div class="brand-tagline">Reconoce &middot; Analiza &middot; Confiable</div>
+            </div>
+          </div>
+          <p>VisionCash es una soluci&oacute;n de inteligencia artificial dise&ntilde;ada para facilitar la identificaci&oacute;n de billetes colombianos a trav&eacute;s de la c&aacute;mara de tu dispositivo.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Gracias por visitar</h4>
+          <p>Tu confianza nos motiva a seguir mejorando. Si encuentras alg&uacute;n inconveniente o tienes sugerencias, no dudes en contactarnos. Estamos para ayudarte.</p>
+        </div>
+
+        <div class="footer-col">
+          <ul class="footer-links">
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+              <a href="Contacto.html">Contacto</a>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              <a href="Terminos.html">T&eacute;rminos y condiciones</a>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <a href="Politicas.html">Pol&iacute;ticas de privacidad</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        &copy; 2025 VisionCash &nbsp;&middot;&nbsp; Inteligencia artificial al servicio de tu seguridad financiera.
+      </div>
+    </div>
+    <div class="footer-bar"></div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script>
+    var inputNombre = document.getElementById("nombre");
+    var inputApellido = document.getElementById("apellido");
+    var inputUsuario = document.getElementById("usuario");
+    var inputCorreo = document.getElementById("correo");
+    var inputPassword = document.getElementById("password");
+    var inputPassword2 = document.getElementById("password2");
+    var errNombre = document.getElementById("err-nombre");
+    var errApellido = document.getElementById("err-apellido");
+    var errPassword2 = document.getElementById("err-password2");
+    var submitBtn = document.getElementById("submitBtn");
+    var registroErrorMsg = document.getElementById("registroErrorMsg");
+    var togglePassword = document.getElementById("togglePassword");
+    var togglePassword2 = document.getElementById("togglePassword2");
+
+    function setRuleState(id, valid) {
+      var item = document.getElementById(id);
+      if (!item) return;
+      var icon = item.querySelector(".rule-icon");
+      if (valid) { item.classList.add("valid"); } else { item.classList.remove("valid"); }
+      if (icon) icon.textContent = valid ? "\u2713" : "\u00d7";
+    }
+
+    function getValidations() {
+      var nombre = inputNombre.value.trim();
+      var apellido = inputApellido.value.trim();
+      var usuario = inputUsuario.value.trim();
+      var correo = inputCorreo.value.trim();
+      var password = inputPassword.value;
+      var password2 = inputPassword2.value;
+
+      var v = {
+        nombre: nombre.length >= 2,
+        apellido: apellido.length >= 2,
+        usuario: { minLength: usuario.length >= 4, hasUppercase: /[A-Z]/.test(usuario), hasNumber: /[0-9]/.test(usuario) },
+        correo: { hasAt: correo.includes("@"), endsCom: correo.toLowerCase().endsWith(".com") },
+        password: {
+          minLength: password.length >= 8,
+          hasUppercase: /[A-Z]/.test(password),
+          hasLowercase: /[a-z]/.test(password),
+          hasNumber: /[0-9]/.test(password),
+          hasSymbol: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+        },
+        confirmPassword: password === password2 && password2.length > 0
+      };
+
+      var isUsuarioValid = v.usuario.minLength && v.usuario.hasUppercase && v.usuario.hasNumber;
+      var isCorreoValid = v.correo.hasAt && v.correo.endsCom;
+      var isPasswordValid = v.password.minLength && v.password.hasUppercase && v.password.hasLowercase && v.password.hasNumber && v.password.hasSymbol;
+      var isFormValid = v.nombre && v.apellido && isUsuarioValid && isCorreoValid && isPasswordValid && v.confirmPassword;
+
+      return { nombre: nombre, apellido: apellido, usuario: usuario, correo: correo, password: password, validations: v, isFormValid: isFormValid };
+    }
+
+    function updateRuleCards(v) {
+      setRuleState("rule-user-min", v.usuario.minLength);
+      setRuleState("rule-user-upper", v.usuario.hasUppercase);
+      setRuleState("rule-user-number", v.usuario.hasNumber);
+      setRuleState("rule-pass-min", v.password.minLength);
+      setRuleState("rule-pass-upper", v.password.hasUppercase);
+      setRuleState("rule-pass-lower", v.password.hasLowercase);
+      setRuleState("rule-pass-number", v.password.hasNumber);
+      setRuleState("rule-pass-symbol", v.password.hasSymbol);
+      setRuleState("rule-mail-at", v.correo.hasAt);
+      setRuleState("rule-mail-com", v.correo.endsCom);
+    }
+
+    var touched = { nombre: false, apellido: false, usuario: false, correo: false, password: false, password2: false };
+
+    function updateFormUI() {
+      var r = getValidations();
+      updateRuleCards(r.validations);
+      if (touched.nombre) {
+        inputNombre.classList.toggle("invalid", !r.validations.nombre);
+        errNombre.classList.toggle("show", !r.validations.nombre);
+      }
+      if (touched.apellido) {
+        inputApellido.classList.toggle("invalid", !r.validations.apellido);
+        errApellido.classList.toggle("show", !r.validations.apellido);
+      }
+      if (touched.password2) {
+        inputPassword2.classList.toggle("invalid", !r.validations.confirmPassword);
+        errPassword2.classList.toggle("show", !r.validations.confirmPassword);
+      }
+      submitBtn.disabled = !r.isFormValid;
+    }
+
+    [inputNombre, inputApellido, inputUsuario, inputCorreo, inputPassword, inputPassword2].forEach(function(el) {
+      el.addEventListener("input", function() {
+        registroErrorMsg.style.display = "none";
+        updateFormUI();
+      });
+    });
+
+    inputNombre.addEventListener("blur", function() { touched.nombre = true; updateFormUI(); });
+    inputApellido.addEventListener("blur", function() { touched.apellido = true; updateFormUI(); });
+    inputUsuario.addEventListener("blur", function() { touched.usuario = true; updateFormUI(); });
+    inputCorreo.addEventListener("blur", function() { touched.correo = true; updateFormUI(); });
+    inputPassword.addEventListener("blur", function() { touched.password = true; updateFormUI(); });
+    inputPassword2.addEventListener("blur", function() { touched.password2 = true; updateFormUI(); });
+
+    togglePassword.addEventListener("click", function() {
+      var isHidden = inputPassword.type === "password";
+      inputPassword.type = isHidden ? "text" : "password";
+      togglePassword.textContent = isHidden ? "\uD83D\uDE48" : "\uD83D\uDC41";
+    });
+    togglePassword2.addEventListener("click", function() {
+      var isHidden = inputPassword2.type === "password";
+      inputPassword2.type = isHidden ? "text" : "password";
+      togglePassword2.textContent = isHidden ? "\uD83D\uDE48" : "\uD83D\uDC41";
+    });
+
+    document.getElementById("registroForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      touched.nombre = true; touched.apellido = true; touched.usuario = true;
+      touched.correo = true; touched.password = true; touched.password2 = true;
+      updateFormUI();
+      var r = getValidations();
+      if (!r.isFormValid) {
+        registroErrorMsg.textContent = "Revisa los campos y cumple todos los requisitos antes de continuar.";
+        registroErrorMsg.style.display = "block";
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Guardando en base de datos...";
+
+      fetch(CONFIG.apiUrl("/api/auth/registro"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre: r.nombre,
+          apellido: r.apellido,
+          usuario: r.usuario,
+          correo: r.correo,
+          password: r.password
+        })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Crear cuenta";
+        if (data.success) {
+          localStorage.setItem("gv_pending_user", r.usuario);
+          var code2fa = (data.usuario && data.usuario.codigo_2fa) ? data.usuario.codigo_2fa : "123456";
+          localStorage.setItem("gv_pending_code", code2fa);
+          window.location.href = "verificar_2fa.html?username=" + encodeURIComponent(r.usuario) + "&code=" + encodeURIComponent(code2fa);
+        } else {
+          registroErrorMsg.textContent = data.error || "No se pudo registrar en la base de datos.";
+          registroErrorMsg.style.display = "block";
+        }
+      })
+      .catch(function(err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Crear cuenta";
+        localStorage.setItem("gv_pending_user", r.usuario);
+        window.location.href = "verificar_2fa.html?username=" + encodeURIComponent(r.usuario);
+      });
+    });
+
+    updateFormUI();
+  </script>
+
+</body>
+</html>

@@ -54,6 +54,7 @@ def after_request_cors(response):
 
 # Raíz del proyecto (Lo que hay en google/)
 BASE_DIR     = Path(__file__).resolve().parent.parent
+VC_DIR       = BASE_DIR
 # Rutas de la estructura organizada
 MODEL_PATH   = BASE_DIR / "motor_ia" / "modelos_entrenados" / "banknote_efficientnetv2s.pt"
 CLASSES_PATH = BASE_DIR / "motor_ia" / "modelos_entrenados" / "classes.json"

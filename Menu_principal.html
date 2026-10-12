@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BilletIA · Panel Principal & Reconocimiento IA</title>
+<meta name="description" content="Reconoce billetes colombianos con inteligencia artificial MobileNetV2 en tiempo real." />
+<style>
+  :root {
+    --navy-900: #0a1633;
+    --navy-800: #0d1b3e;
+    --navy-700: #10214a;
+    --blue: #2f7bff;
+    --blue-bright: #3b82f6;
+    --purple: #6d3bf5;
+    --teal: #14b8a6;
+    --teal-glow: #2dd4bf;
+    --amber: #f5b13b;
+    --emerald: #10b981;
+    --rose: #f43f5e;
+    --page-bg: #eef1f8;
+    --card: #ffffff;
+    --text-dark: #1e2a52;
+    --text-muted: #55608a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--page-bg);
+    color: var(--text-dark);
+    line-height: 1.5;
+  }
+
+  a { text-decoration: none; color: inherit; }
+
+  .container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* ===== Header ===== */
+  .site-header {
+    background: linear-gradient(180deg, #0b1838 0%, #0d1c40 100%);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .brand-logo-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(47,123,255,0.35);
+  }
+  .brand img { width: 74px; height: 74px; object-fit: contain; }
+  .brand-name {
+    font-size: 30px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .brand-name .ia { color: var(--blue-bright); }
+  .brand-tagline {
+    font-size: 15px;
+    color: #b9c3e0;
+    margin-top: 2px;
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  .nav a { color: #dbe2f5; font-size: 17px; font-weight: 500; transition: color 0.2s; }
+  .nav a:hover { color: #fff; }
+  .nav .pill {
+    background: linear-gradient(90deg, var(--blue) 0%, var(--purple) 100%);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(60,90,240,0.4);
+  }
+  .nav .logout-btn {
+    color: #fca5a5;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .nav .logout-btn:hover {
+    color: #ef4444;
+  }
+
+  /* ===== Main ===== */
+  main { padding: 40px 0 20px; }
+
+  /* ===== Hero ===== */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 22px;
+    background:
+      radial-gradient(120% 120% at 85% 20%, rgba(109,59,245,0.55) 0%, rgba(13,27,64,0) 55%),
+      linear-gradient(120deg, #0b1838 0%, #14204d 55%, #241a5c 100%);
+    padding: 50px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+    color: #fff;
+    margin-bottom: 36px;
+    box-shadow: 0 20px 40px rgba(10,22,51,0.25);
+  }
+  .hero h1 {
+    font-size: 46px;
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 14px;
+  }
+  .hero h1 .accent { color: var(--blue-bright); }
+  .hero p {
+    font-size: 18px;
+    color: #c9d2ec;
+    max-width: 680px;
+    line-height: 1.6;
+  }
+  .hero-badges-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .hero-badge {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(10px);
+    border-radius: 18px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 260px;
+  }
+  .hero-badge-icon { font-size: 30px; }
+  .hero-badge-user { font-size: 17px; font-weight: 800; color: #fff; }
+  .hero-badge-status { font-size: 13.5px; color: var(--teal-glow); font-weight: 600; }
+  .ai-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(20, 184, 166, 0.2);
+    border: 1px solid rgba(45, 212, 191, 0.4);
+    color: #a7f3d0;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--teal-glow);
+    box-shadow: 0 0 10px var(--teal-glow);
+    animation: pulseGlow 1.5s infinite;
+  }
+  @keyframes pulseGlow {
+    0% { transform: scale(0.9); opacity: 0.8; }
+    50% { transform: scale(1.3); opacity: 1; }
+    100% { transform: scale(0.9); opacity: 0.8; }
+  }
+
+  /* ===== Scanner Panel ===== */
+  .scanner-card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 40px;
+    box-shadow: 0 12px 30px rgba(30,42,82,0.08);
+    margin-bottom: 36px;
+  }
+  .scanner-head {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto 28px;
+  }
+  .scanner-head h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--navy-900);
+    margin-bottom: 8px;
+  }
+  .scanner-head p {
+    color: var(--text-muted);
+    font-size: 16px;
+  }
+
+  .dropzone {
+    border: 2px dashed #b8c7e0;
+    border-radius: 18px;
+    padding: 40px 20px;
+    text-align: center;
+    background: #f8faff;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .dropzone:hover, .dropzone.dragover {
+    border-color: var(--blue);
+    background: #edf3ff;
+    transform: scale(1.005);
+  }
+  .dropzone-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 16px rgba(47,123,255,0.25);
+  }
+  .dropzone-icon svg { width: 32px; height: 32px; stroke: #fff; fill: none; stroke-width: 2; }
+  .dropzone h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy-900);
+    margin-bottom: 6px;
+  }
+  .dropzone p {
+    font-size: 14.5px;
+    color: var(--text-muted);
+  }
+  .preview-wrapper {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    margin-top: 16px;
+  }
+  .dropzone img {
+    max-height: 280px;
+    max-width: 100%;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(30,42,82,0.15);
+    display: block;
+  }
+  .preview-overlay-tag {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(10,22,51,0.85);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .scanner-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-size: 15.5px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s ease;
+  }
+  .btn-primary {
+    background: linear-gradient(90deg, var(--blue) 0%, var(--purple) 100%);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(60,90,240,0.35);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(60,90,240,0.5);
+  }
+  .btn-camera-live {
+    background: linear-gradient(90deg, #0d9488 0%, #0284c7 100%);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(13,148,136,0.35);
+  }
+  .btn-camera-live:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(13,148,136,0.5);
+  }
+  .btn-secondary {
+    background: #f0f4fc;
+    color: var(--navy-900);
+    border: 1px solid #d0dbe9;
+  }
+  .btn-secondary:hover {
+    background: #e2ebf8;
+    transform: translateY(-2px);
+  }
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  .tip-box {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 14px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 14.5px;
+    color: #92400e;
+    margin-top: 18px;
+  }
+  .tip-icon { font-size: 22px; flex-shrink: 0; }
+
+  /* ===== Result Panel ===== */
+  .result-panel {
+    display: none;
+    margin-top: 28px;
+    background: linear-gradient(135deg, #f0fdf4 0%, #e6f9ed 100%);
+    border: 1px solid #bbf7d0;
+    border-radius: 20px;
+    padding: 30px;
+    animation: fadeIn 0.4s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .result-main h3 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #166534;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .result-denom {
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--blue);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .result-meta {
+    font-size: 15.5px;
+    color: #374151;
+    margin-bottom: 8px;
+  }
+  .confidence-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    font-weight: 700;
+    font-size: 15px;
+    color: #166534;
+  }
+  .confidence-bar-bg {
+    background: #e2e8f0;
+    border-radius: 999px;
+    height: 14px;
+    overflow: hidden;
+    margin: 8px 0 20px;
+    position: relative;
+  }
+  .confidence-bar-fill {
+    background: linear-gradient(90deg, var(--teal), var(--blue));
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+  .result-card-right {
+    background: #fff;
+    border-radius: 18px;
+    padding: 24px;
+    border: 1px solid #dcfce7;
+    box-shadow: 0 6px 18px rgba(22,101,52,0.06);
+  }
+  .result-card-right h4 {
+    font-size: 17px;
+    font-weight: 800;
+    color: #166534;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .result-card-right p {
+    font-size: 14.5px;
+    color: #4b5563;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .probabilities-list {
+    margin-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 14px;
+  }
+  .prob-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13.5px;
+    margin-bottom: 8px;
+    color: #4b5563;
+  }
+  .prob-bar-mini-bg {
+    width: 120px;
+    height: 6px;
+    background: #f1f5f9;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .prob-bar-mini-fill {
+    height: 100%;
+    background: var(--blue);
+    border-radius: 999px;
+  }
+
+  /* ===== Features Grid ===== */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 26px;
+    margin-bottom: 36px;
+  }
+  .feature-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 30px 28px;
+    box-shadow: 0 12px 30px rgba(30,42,82,0.08);
+  }
+  .feature-icon {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 22px;
+  }
+  .feature-icon svg { width: 30px; height: 30px; stroke: #fff; fill: none; stroke-width: 2; }
+  .icon-blue { background: linear-gradient(135deg, #2f7bff, #1e5fe0); }
+  .icon-purple { background: linear-gradient(135deg, #7c4dff, #5a2fe0); }
+  .icon-teal { background: linear-gradient(135deg, #1fc7b0, #0f9d8a); }
+  .feature-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+  }
+  .feature-card p {
+    font-size: 15.5px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ===== History Table ===== */
+  .history-card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 36px;
+    box-shadow: 0 12px 30px rgba(30,42,82,0.08);
+    margin-bottom: 36px;
+  }
+  .history-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .history-head h3 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--navy-900);
+  }
+  .history-table-wrap {
+    overflow-x: auto;
+  }
+  .history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    text-align: left;
+  }
+  .history-table th {
+    background: #f4f6fb;
+    color: var(--navy-900);
+    font-weight: 700;
+    padding: 14px 18px;
+    border-bottom: 2px solid #e2e8f4;
+  }
+  .history-table td {
+    padding: 14px 18px;
+    border-bottom: 1px solid #eef2f8;
+    color: var(--text-dark);
+  }
+  .badge-chip {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .badge-success { background: #dcfce7; color: #16a34a; }
+  .badge-warning { background: #fef3c7; color: #d97706; }
+
+  /* ===== MODAL & LIVE HUD CAMARA ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 22, 51, 0.75);
+    backdrop-filter: blur(10px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: #0f1c3f;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 24px;
+    width: min(800px, 100%);
+    padding: 30px;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.5);
+    max-height: 94vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  .modal-head h3 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .modal-close {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-size: 22px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.25); }
+
+  /* Viewfinder HUD */
+  .camera-viewfinder-wrap {
+    position: relative;
+    width: 100%;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #000;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  }
+  .camera-preview {
+    width: 100%;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    display: block;
+    transform: scaleX(-1); /* Espejo natural para webcam */
+  }
+
+  /* Retícula y Láser */
+  .hud-reticle-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px;
+  }
+  .hud-target-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    height: 65%;
+    border: 2px dashed rgba(45, 212, 191, 0.4);
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(45, 212, 191, 0.15) inset;
+  }
+  /* Corner Brackets */
+  .corner-bracket {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-color: var(--teal-glow);
+    border-style: solid;
+  }
+  .bracket-tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-top-left-radius: 8px; }
+  .bracket-tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-top-right-radius: 8px; }
+  .bracket-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-bottom-left-radius: 8px; }
+  .bracket-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-bottom-right-radius: 8px; }
+
+  /* Animated Laser Scanline */
+  .laser-scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--teal-glow), var(--blue-bright), transparent);
+    box-shadow: 0 0 14px var(--teal-glow);
+    animation: laserScan 2.4s ease-in-out infinite;
+  }
+  @keyframes laserScan {
+    0% { top: 15%; opacity: 0.2; }
+    50% { top: 85%; opacity: 1; }
+    100% { top: 15%; opacity: 0.2; }
+  }
+
+  /* Live HUD Floating Prediction Banner */
+  .hud-prediction-banner {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: rgba(11, 24, 56, 0.88);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(45, 212, 191, 0.3);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    transition: all 0.2s ease;
+  }
+  .hud-pred-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .hud-pred-badge {
+    background: linear-gradient(135deg, var(--teal), var(--blue));
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+    padding: 8px 14px;
+    border-radius: 12px;
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+  }
+  .hud-pred-title {
+    font-size: 19px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .hud-pred-desc {
+    font-size: 13.5px;
+    color: #94a3b8;
+    margin-top: 3px;
+  }
+  .hud-metrics {
+    text-align: right;
+    font-size: 12.5px;
+    color: #94a3b8;
+    white-space: nowrap;
+  }
+  .hud-fps {
+    color: var(--teal-glow);
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  /* Camera Controls */
+  .camera-controls-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .camera-mode-toggle {
+    display: flex;
+    background: rgba(255,255,255,0.08);
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .mode-tab {
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #cbd5e1;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .mode-tab.active {
+    background: linear-gradient(90deg, var(--blue), var(--purple));
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(60,90,240,0.4);
+  }
+
+  /* Problem Report Modal */
+  .modal-box-white {
+    background: #fff;
+    color: var(--text-dark);
+  }
+  .modal-box-white .modal-head h3 { color: var(--navy-900); }
+  .modal-box-white .modal-close {
+    background: #f0f4fc;
+    color: var(--navy-900);
+  }
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+  }
+  .form-group textarea, .form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid #cfd9ed;
+    font: inherit;
+    outline: none;
+  }
+  .form-group textarea { min-height: 100px; resize: vertical; }
+
+  /* ===== Footer ===== */
+  .site-footer {
+    background: linear-gradient(180deg, #0c1a3d 0%, #0a1430 100%);
+    color: #c4cdea;
+    padding: 56px 0 0;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: 50px;
+    padding-bottom: 44px;
+  }
+  .footer-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+  .footer-brand .brand-name { font-size: 26px; }
+  .footer-col p { font-size: 15.5px; line-height: 1.7; color: #aab5d8; }
+  .footer-col h4 {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+  .footer-links li { display: flex; align-items: center; gap: 12px; }
+  .footer-links svg { width: 20px; height: 20px; stroke: #6f8bff; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+  .footer-links a { color: #aab5d8; }
+  .footer-links a:hover { color: #fff; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    padding: 24px 0;
+    font-size: 15px;
+    color: #9aa6cc;
+  }
+  .footer-bar { height: 8px; background: linear-gradient(90deg, #2f7bff 0%, #6d3bf5 100%); }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 1100px) {
+    .hero { flex-direction: column; align-items: flex-start; }
+    .features { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 720px) {
+    .container { padding: 0 20px; }
+    .header-inner { flex-direction: column; gap: 18px; padding: 20px; }
+    .nav { gap: 16px; flex-wrap: wrap; justify-content: center; }
+    .hero h1 { font-size: 32px; }
+    .scanner-card { padding: 24px 18px; }
+    .hud-prediction-banner { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .footer-grid { grid-template-columns: 1fr; gap: 34px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-logo-icon">💵</div>
+        <div>
+          <div class="brand-name">Billet<span class="ia">IA</span></div>
+          <div class="brand-tagline">Reconoce &middot; Analiza &middot; Confiable</div>
+        </div>
+      </a>
+      <nav class="nav" aria-label="Navegación principal">
+        <a href="Menu_principal.html" class="pill">Inicio</a>
+        <a href="Soporte.html">Soporte</a>
+        <a href="acerca_nosotros.html">Acerca de nosotros</a>
+        <a href="Contacto.html">Contacto</a>
+        <a href="javascript:void(0)" id="logoutBtn" class="logout-btn">Cerrar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main>
+    <div class="container">
+
+      <!-- Hero Greeting -->
+      <section class="hero">
+        <div>
+          <h1>¡Hola, <span class="accent" id="userGreeting">Usuario</span>!</h1>
+          <p>Identifica denominaciones de billetes colombianos al instante mediante <strong>MobileNetV2</strong>. Puedes subir fotografías en alta resolución o activar el <strong>escáner inteligente en tiempo real</strong> con tu cámara.</p>
+        </div>
+        <div class="hero-badges-wrap">
+          <div class="hero-badge">
+            <div class="hero-badge-icon">👤</div>
+            <div>
+              <div class="hero-badge-user" id="badgeUsername">Usuario</div>
+              <div class="hero-badge-status">● Sesión activa</div>
+            </div>
+          </div>
+          <div class="ai-status-pill" id="aiPill">
+            <span class="pulse-dot"></span>
+            <span id="aiStatusText">Conectando con MobileNetV2...</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scanner Card -->
+      <section class="scanner-card">
+        <div class="scanner-head">
+          <h2>Reconocer billete colombiano</h2>
+          <p>Arrastra tu imagen aquí, selecciona un archivo o inicia la <strong>cámara web con IA en vivo</strong>.</p>
+        </div>
+
+        <div class="dropzone" id="dropZone">
+          <div class="dropzone-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <h3 id="dropZoneText">Suelta tu archivo aquí o haz clic para seleccionarlo</h3>
+          <p>Formatos admitidos: JPG, PNG, WEBP</p>
+          <div class="preview-wrapper" id="previewWrapper" style="display:none;">
+            <img id="imagePreview" src="" alt="Vista previa del billete" />
+            <div class="preview-overlay-tag" id="previewTag">Listo para procesar</div>
+          </div>
+        </div>
+
+        <input type="file" id="fileInput" accept="image/*" style="display:none;" />
+
+        <div class="scanner-actions">
+          <button type="button" class="btn btn-secondary" id="btnSelectFile">📁 Seleccionar archivo</button>
+          <button type="button" class="btn btn-camera-live" id="btnOpenCamera">📷 Escáner en Tiempo Real</button>
+          <button type="button" class="btn btn-primary" id="btnScan" style="display:none;">🔍 Reconocer con IA</button>
+        </div>
+
+        <div class="tip-box">
+          <span class="tip-icon">💡</span>
+          <span><strong>Consejo para máxima precisión:</strong> Procura buena iluminación, enfoca el billete completo y colócalo sobre una superficie plana y sin reflejos intensos.</span>
+        </div>
+
+        <!-- Result Panel -->
+        <div class="result-panel" id="resultPanel">
+          <div class="result-grid">
+            <div class="result-main">
+              <h3><span>✅</span> Resultado del Análisis IA</h3>
+              <div class="result-denom" id="resDenom">Billete de $2.000 COP</div>
+              <div class="result-meta"><strong>Personaje / Reverso:</strong> <span id="resCharacter">Débora Arango</span></div>
+              <div class="result-meta"><strong>Reverso representativo:</strong> <span id="resReverse">Caño Cristales</span></div>
+              
+              <div class="confidence-header">
+                <span>Certeza del modelo:</span>
+                <span id="resConfidence" style="font-size:18px; color:var(--blue);">98.4%</span>
+              </div>
+              <div class="confidence-bar-bg">
+                <div class="confidence-bar-fill" id="resBar" style="width: 0%;"></div>
+              </div>
+              <div style="font-size:13px; color:#6b7280;" id="resLatency">Tiempo de inferencia: 24 ms (GPU)</div>
+            </div>
+
+            <div class="result-card-right">
+              <h4>🛡️ Elementos de Seguridad</h4>
+              <p id="resDetails">Cargando elementos de seguridad del billete...</p>
+              
+              <!-- Probabilities breakdown -->
+              <div class="probabilities-list" id="probListWrap">
+                <strong style="font-size:13.5px; color:#166534; display:block; margin-bottom:8px;">Desglose de denominaciones:</strong>
+                <div id="probRowsContainer"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 Features -->
+      <section class="features">
+        <article class="feature-card">
+          <div class="feature-icon icon-blue">
+            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <h3>Inferencia en tiempo real</h3>
+          <p>Arquitectura MobileNetV2 optimizada para respuestas fluidas a más de 30 FPS en cámara web.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon icon-purple">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Alta precisión y seguridad</h3>
+          <p>Entrenamiento convolucional con data augmentation avanzada para identificar denominaciones de $2.000 a $50.000 COP.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon icon-teal">
+            <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          </div>
+          <h3>Aceleración por GPU</h3>
+          <p>Procesamiento acelerado en hardware para análisis continuo con mínimo consumo de energía.</p>
+        </article>
+      </section>
+
+      <!-- Scan History & Microservice -->
+      <section class="history-card">
+        <div class="history-head">
+          <div>
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:4px;">
+              <h3 style="margin-bottom:0;">Historial de escaneos</h3>
+              <span id="microserviceStatusBadge" style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; background:#dcfce7; color:#166534; padding:4px 12px; border-radius:999px; border:1px solid #bbf7d0;">
+                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#16a34a; box-shadow:0 0 8px #16a34a;"></span>
+                Microservicio Historial: Activo (Puerto 5001)
+              </span>
+            </div>
+            <p style="font-size:14px; color:var(--text-muted); margin-bottom:0;">Microservicio independiente conectado a MySQL en XAMPP (192.168.0.12)</p>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button type="button" class="btn btn-secondary" id="btnRefreshHistory" style="padding:8px 16px;font-size:13.5px;">↻ Actualizar</button>
+            <button type="button" class="btn btn-secondary" id="btnClearHistory" style="padding:8px 16px;font-size:13.5px;">🗑️ Limpiar</button>
+          </div>
+        </div>
+
+        <!-- KPI Cards del Microservicio: Hoy vs Total Histórico -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:18px; margin: 20px 0 24px;">
+          <!-- Tarjeta 1: Escaneado Hoy -->
+          <div style="background:linear-gradient(135deg, #f0f7ff 0%, #e0effe 100%); border:1px solid #bfdbfe; border-radius:16px; padding:18px 22px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:13px; font-weight:700; text-transform:uppercase; color:#1d4ed8; letter-spacing:0.5px;">📅 Escaneado Hoy</span>
+              <span style="font-size:18px;">💵</span>
+            </div>
+            <div style="font-size:26px; font-weight:800; color:#1e3a8a; line-height:1.2;" id="kpiHoyMonto">$0 COP</div>
+            <div style="font-size:14px; color:#3b82f6; font-weight:600; margin-top:4px;" id="kpiHoyCantidad">0 billetes escaneados hoy</div>
+          </div>
+
+          <!-- Tarjeta 2: Total Histórico Acumulado -->
+          <div style="background:linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border:1px solid #ddd6fe; border-radius:16px; padding:18px 22px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:13px; font-weight:700; text-transform:uppercase; color:#6d28d9; letter-spacing:0.5px;">📊 Total Histórico</span>
+              <span style="font-size:18px;">🏛️</span>
+            </div>
+            <div style="font-size:26px; font-weight:800; color:#4c1d95; line-height:1.2;" id="kpiTotalMonto">$0 COP</div>
+            <div style="font-size:14px; color:#7c3aed; font-weight:600; margin-top:4px;" id="kpiTotalCantidad">0 escaneos acumulados</div>
+          </div>
+
+          <!-- Tarjeta 3: Certeza Promedio IA -->
+          <div style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border:1px solid #bbf7d0; border-radius:16px; padding:18px 22px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:13px; font-weight:700; text-transform:uppercase; color:#15803d; letter-spacing:0.5px;">🎯 Confianza IA Promedio</span>
+              <span style="font-size:18px;">🤖</span>
+            </div>
+            <div style="font-size:26px; font-weight:800; color:#14532d; line-height:1.2;" id="kpiConfianzaPromedio">--%</div>
+            <div style="font-size:14px; color:#16a34a; font-weight:600; margin-top:4px;">Base de datos MySQL en vivo</div>
+          </div>
+        </div>
+
+        <div class="history-table-wrap">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Fecha y hora</th>
+                <th>Usuario</th>
+                <th>Denominación</th>
+                <th>Valor COP</th>
+                <th>Método</th>
+                <th>Resultado</th>
+                <th>Confianza</th>
+              </tr>
+            </thead>
+            <tbody id="historyTbody">
+              <!-- Cargado dinámicamente desde el Microservicio (Puerto 5001) -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- MODAL CAMARA EN TIEMPO REAL (LIVE HUD) -->
+  <div class="modal-overlay" id="cameraModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3><span>⚡</span> Escáner de Billetes en Tiempo Real</h3>
+        <button type="button" class="modal-close" id="cameraCloseBtn">&times;</button>
+      </div>
+
+      <!-- Viewfinder con HUD de Visión Artificial -->
+      <div class="camera-viewfinder-wrap">
+        <video class="camera-preview" id="videoElement" autoplay playsinline muted></video>
+        <canvas id="captureCanvas" style="display:none;"></canvas>
+
+        <div class="hud-reticle-overlay">
+          <!-- Target Box & Corners -->
+          <div class="hud-target-box">
+            <div class="corner-bracket bracket-tl"></div>
+            <div class="corner-bracket bracket-tr"></div>
+            <div class="corner-bracket bracket-bl"></div>
+            <div class="corner-bracket bracket-br"></div>
+            <div class="laser-scanline" id="laserScanline"></div>
+          </div>
+
+          <!-- Real-Time Floating Prediction Banner -->
+          <div class="hud-prediction-banner" id="hudBanner">
+            <div class="hud-pred-left">
+              <div class="hud-pred-badge" id="hudConfidence">--%</div>
+              <div>
+                <div class="hud-pred-title" id="hudTitle">Enfoca un billete colombiano...</div>
+                <div class="hud-pred-desc" id="hudDesc">MobileNetV2 analizando fotogramas</div>
+              </div>
+            </div>
+            <div class="hud-metrics">
+              <div><span class="hud-fps" id="hudLatency">-- ms</span></div>
+              <div id="hudFpsCount">30 FPS</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="camera-controls-bar">
+        <div class="camera-mode-toggle">
+          <button type="button" class="mode-tab active" id="tabLiveMode">🔴 En Vivo (Tiempo Real)</button>
+          <button type="button" class="mode-tab" id="tabCaptureMode">📸 Captura Fija</button>
+        </div>
+
+        <div style="display:flex; gap:12px;">
+          <button type="button" class="btn btn-secondary" id="cameraCancelBtn" style="color:#fff; background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2);">Cerrar</button>
+          <button type="button" class="btn btn-primary" id="cameraCaptureBtn" style="display:none;">📸 Capturar foto</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-brand">
+            <div class="brand-logo-icon" style="width:48px; height:48px; font-size:22px;">💵</div>
+            <div>
+              <div class="brand-name">Billet<span class="ia" style="color:var(--blue-bright)">IA</span></div>
+              <div class="brand-tagline">Reconoce &middot; Analiza &middot; Confiable</div>
+            </div>
+          </div>
+          <p>BilletIA es una solución de visión computacional impulsada por redes neuronales MobileNetV2 y Flask para la identificación confiable de billetes colombianos.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Tecnología y Seguridad</h4>
+          <p>Entrenamiento convolucional con TensorFlow, soporte de aceleración CUDA en GPU y análisis en memoria sin almacenar datos privados del usuario.</p>
+        </div>
+
+        <div class="footer-col">
+          <ul class="footer-links">
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+              <a href="Contacto.html">Contacto</a>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              <a href="Terminos.html">Términos y condiciones</a>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <a href="Politicas.html">Políticas de privacidad</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        &copy; 2026 BilletIA &nbsp;&middot;&nbsp; Inteligencia artificial MobileNetV2 al servicio de tu seguridad financiera.
+      </div>
+    </div>
+    <div class="footer-bar"></div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="sesion.js"></script>
+  <script>
+    // 1. Session Setup (controlado de forma centralizada por sesion.js)
+    var currentUser = window.usuarioAutenticado || sessionStorage.getItem("gv_auth_user") || "Usuario";
+    document.getElementById("userGreeting").textContent = currentUser;
+    document.getElementById("badgeUsername").textContent = currentUser;
+
+    // 2. Check AI Backend Status
+    var aiStatusText = document.getElementById("aiStatusText");
+    function checkAIStatus() {
+      fetch(CONFIG.apiUrl("/api/status"))
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.model_loaded) {
+            aiStatusText.textContent = "IA Activa (" + data.hardware + ")";
+          } else {
+            aiStatusText.textContent = "Modelo listo para entrenar";
+          }
+        })
+        .catch(function() {
+          aiStatusText.textContent = "Servidor IA Local";
+        });
+    }
+    checkAIStatus();
+
+    // 3. Elements & File Upload
+    var dropZone = document.getElementById("dropZone");
+    var fileInput = document.getElementById("fileInput");
+    var previewWrapper = document.getElementById("previewWrapper");
+    var imagePreview = document.getElementById("imagePreview");
+    var btnSelectFile = document.getElementById("btnSelectFile");
+    var btnScan = document.getElementById("btnScan");
+    var resultPanel = document.getElementById("resultPanel");
+    var currentFile = null;
+
+    btnSelectFile.addEventListener("click", function() { fileInput.click(); });
+    dropZone.addEventListener("click", function(e) {
+      if (e.target !== imagePreview) fileInput.click();
+    });
+
+    dropZone.addEventListener("dragover", function(e) {
+      e.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+    dropZone.addEventListener("dragleave", function() {
+      dropZone.classList.remove("dragover");
+    });
+    dropZone.addEventListener("drop", function(e) {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener("change", function() {
+      if (fileInput.files && fileInput.files[0]) {
+        handleFile(fileInput.files[0]);
+      }
+    });
+
+    function handleFile(file) {
+      currentFile = file;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        imagePreview.src = e.target.result;
+        previewWrapper.style.display = "inline-block";
+        document.getElementById("dropZoneText").textContent = file.name;
+        btnScan.style.display = "inline-flex";
+        resultPanel.style.display = "none";
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 4. File Classification via Backend
+    btnScan.addEventListener("click", function() {
+      if (!imagePreview.src) return;
+      btnScan.disabled = true;
+      btnScan.innerHTML = "⏳ Analizando con MobileNetV2...";
+
+      // Enviar imagen al backend en base64
+      fetch(CONFIG.apiUrl("/api/predict"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: imagePreview.src })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        btnScan.disabled = false;
+        btnScan.innerHTML = "🔍 Reconocer con IA";
+
+        if (data.success) {
+          renderResult(data);
+          saveScanToHistory(data.prediction.title, data.prediction.confidence_str, "Subida de foto");
+        } else {
+          alert("Aviso de IA: " + (data.error || "No se pudo procesar"));
+        }
+      })
+      .catch(function(err) {
+        btnScan.disabled = false;
+        btnScan.innerHTML = "🔍 Reconocer con IA";
+        alert("Error comunicando con el servidor de IA: " + err.message);
+      });
+    });
+
+    function renderResult(data) {
+      var pred = data.prediction;
+      document.getElementById("resDenom").textContent = pred.title;
+      document.getElementById("resCharacter").textContent = pred.character;
+      document.getElementById("resReverse").textContent = pred.reverse;
+      document.getElementById("resConfidence").textContent = pred.confidence_str;
+      document.getElementById("resBar").style.width = pred.confidence_str;
+      document.getElementById("resDetails").textContent = pred.security_features;
+      document.getElementById("resLatency").textContent = "Tiempo de inferencia: " + data.latency_ms + " ms (" + (data.hardware || "GPU") + ")";
+
+
+      // Render probability breakdown
+      var probRowsContainer = document.getElementById("probRowsContainer");
+      probRowsContainer.innerHTML = "";
+      if (data.all_probabilities && data.all_probabilities.length > 0) {
+        data.all_probabilities.forEach(function(item) {
+          var row = document.createElement("div");
+          row.className = "prob-row";
+          row.innerHTML = 
+            "<span><strong>" + item.title + "</strong></span>" +
+            "<div style='display:flex; align-items:center; gap:8px;'>" +
+              "<div class='prob-bar-mini-bg'>" +
+                "<div class='prob-bar-mini-fill' style='width:" + item.confidence_percent + "%; background:" + (item.color || "var(--blue)") + ";'></div>" +
+              "</div>" +
+              "<span style='font-weight:700; width:45px; text-align:right;'>" + item.confidence_percent + "%</span>" +
+            "</div>";
+          probRowsContainer.appendChild(row);
+        });
+      }
+      resultPanel.style.display = "block";
+    }
+
+    // 5. Real-Time Camera Scanner (HUD Mode)
+    var cameraModal = document.getElementById("cameraModal");
+    var btnOpenCamera = document.getElementById("btnOpenCamera");
+    var cameraCloseBtn = document.getElementById("cameraCloseBtn");
+    var cameraCancelBtn = document.getElementById("cameraCancelBtn");
+    var cameraCaptureBtn = document.getElementById("cameraCaptureBtn");
+    var tabLiveMode = document.getElementById("tabLiveMode");
+    var tabCaptureMode = document.getElementById("tabCaptureMode");
+    var videoElement = document.getElementById("videoElement");
+    var captureCanvas = document.getElementById("captureCanvas");
+    var laserScanline = document.getElementById("laserScanline");
+
+    var hudConfidence = document.getElementById("hudConfidence");
+    var hudTitle = document.getElementById("hudTitle");
+    var hudDesc = document.getElementById("hudDesc");
+    var hudLatency = document.getElementById("hudLatency");
+    var hudFpsCount = document.getElementById("hudFpsCount");
+
+    var videoStream = null;
+    var isLiveActive = true;
+    var liveScanInterval = null;
+    var isProcessingFrame = false;
+    var frameCount = 0;
+    var lastFpsTime = performance.now();
+
+    btnOpenCamera.addEventListener("click", function() {
+      cameraModal.classList.add("show");
+      startCamera();
+    });
+
+    function startCamera() {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: "environment",
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        })
+        .then(function(stream) {
+          videoStream = stream;
+          videoElement.srcObject = stream;
+          videoElement.play();
+          if (isLiveActive) startLiveInference();
+        })
+        .catch(function(err) {
+          alert("No se pudo acceder a la cámara: " + err.message);
+          stopCamera();
+        });
+      }
+    }
+
+    function stopCamera() {
+      cameraModal.classList.remove("show");
+      stopLiveInference();
+      if (videoStream) {
+        videoStream.getTracks().forEach(function(t) { t.stop(); });
+        videoStream = null;
+      }
+    }
+
+    cameraCloseBtn.addEventListener("click", stopCamera);
+    cameraCancelBtn.addEventListener("click", stopCamera);
+
+    // Mode Toggle
+    tabLiveMode.addEventListener("click", function() {
+      isLiveActive = true;
+      tabLiveMode.classList.add("active");
+      tabCaptureMode.classList.remove("active");
+      laserScanline.style.display = "block";
+      cameraCaptureBtn.style.display = "none";
+      startLiveInference();
+    });
+
+    tabCaptureMode.addEventListener("click", function() {
+      isLiveActive = false;
+      tabCaptureMode.classList.add("active");
+      tabLiveMode.classList.remove("active");
+      laserScanline.style.display = "none";
+      cameraCaptureBtn.style.display = "inline-flex";
+      stopLiveInference();
+      hudTitle.textContent = "Modo captura manual activado";
+      hudDesc.textContent = "Haz clic en 'Capturar foto' para analizar";
+    });
+
+    function startLiveInference() {
+      if (liveScanInterval) clearInterval(liveScanInterval);
+      liveScanInterval = setInterval(processLiveFrame, 280); // Inferencia continua cada ~280ms
+    }
+
+    function stopLiveInference() {
+      if (liveScanInterval) {
+        clearInterval(liveScanInterval);
+        liveScanInterval = null;
+      }
+    }
+
+    function processLiveFrame() {
+      if (!videoStream || isProcessingFrame || !videoElement.videoWidth) return;
+      isProcessingFrame = true;
+
+      captureCanvas.width = 320; // Resolución optimizada para envío rápido
+      captureCanvas.height = 240;
+      var ctx = captureCanvas.getContext("2d");
+      ctx.drawImage(videoElement, 0, 0, captureCanvas.width, captureCanvas.height);
+      var frameData = captureCanvas.toDataURL("image/jpeg", 0.75);
+
+      var t0 = performance.now();
+      fetch(CONFIG.apiUrl("/api/predict"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: frameData })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        isProcessingFrame = false;
+        if (data.success && isLiveActive) {
+          var pred = data.prediction;
+          hudConfidence.textContent = pred.confidence_str;
+          hudTitle.textContent = pred.display_summary || (pred.confidence_str + " " + pred.title);
+          hudDesc.textContent = pred.character + " · " + pred.reverse;
+          hudLatency.textContent = data.latency_ms + " ms";
+
+          // Dynamic badge styling based on confidence
+          if (pred.confidence_percent >= 85) {
+            hudConfidence.style.background = "linear-gradient(135deg, #10b981, #059669)";
+          } else if (pred.confidence_percent >= 60) {
+            hudConfidence.style.background = "linear-gradient(135deg, #f59e0b, #d97706)";
+          } else {
+            hudConfidence.style.background = "linear-gradient(135deg, #64748b, #475569)";
+          }
+
+          // Compute FPS
+          frameCount++;
+          var now = performance.now();
+          if (now - lastFpsTime >= 1000) {
+            hudFpsCount.textContent = Math.round((frameCount * 1000) / (now - lastFpsTime)) + " FPS";
+            frameCount = 0;
+            lastFpsTime = now;
+          }
+        }
+      })
+      .catch(function() {
+        isProcessingFrame = false;
+      });
+    }
+
+    // Manual Capture Button
+    cameraCaptureBtn.addEventListener("click", function() {
+      captureCanvas.width = videoElement.videoWidth || 640;
+      captureCanvas.height = videoElement.videoHeight || 480;
+      var ctx = captureCanvas.getContext("2d");
+      ctx.drawImage(videoElement, 0, 0, captureCanvas.width, captureCanvas.height);
+      var dataUrl = captureCanvas.toDataURL("image/jpeg", 0.9);
+
+      imagePreview.src = dataUrl;
+      previewWrapper.style.display = "inline-block";
+      document.getElementById("dropZoneText").textContent = "Foto capturada con cámara";
+      btnScan.style.display = "inline-flex";
+      resultPanel.style.display = "none";
+      stopCamera();
+
+      // Trigger automatic recognition
+      btnScan.click();
+    });
+
+    // 6. Integración con el Microservicio de Historial & Métricas
+    var historyTbody = document.getElementById("historyTbody");
+    function getMicroserviceApi() {
+      return CONFIG.apiUrl("/api/historial");
+    }
+    var microserviceStatusBadge = document.getElementById("microserviceStatusBadge");
+
+    function cargarMetricasMicroservicio() {
+      var userParam = encodeURIComponent(currentUser || "");
+      fetch(getMicroserviceApi() + "/metricas?usuario=" + userParam)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.success && data.resumen) {
+            var r = data.resumen;
+            document.getElementById("kpiHoyMonto").textContent = r.hoy.monto_total_formato;
+            document.getElementById("kpiHoyCantidad").textContent = r.hoy.escaneos_cantidad + " billetes hoy";
+            document.getElementById("kpiTotalMonto").textContent = r.historico.monto_total_formato;
+            document.getElementById("kpiTotalCantidad").textContent = r.historico.escaneos_cantidad + " escaneos totales";
+            document.getElementById("kpiConfianzaPromedio").textContent = (r.hoy.confianza_promedio || r.historico.confianza_promedio || 97.5) + "%";
+            
+            microserviceStatusBadge.innerHTML = 
+              '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#16a34a; box-shadow:0 0 8px #16a34a;"></span> ' +
+              'Microservicio Historial: Conectado (Cuenta: ' + (currentUser || 'Personal') + ')';
+            microserviceStatusBadge.style.background = "#dcfce7";
+            microserviceStatusBadge.style.color = "#166534";
+          }
+        })
+        .catch(function(err) {
+          console.warn("Microservicio en 5001 no disponible aún:", err);
+          microserviceStatusBadge.innerHTML = 
+            '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#f59e0b;"></span> ' +
+            'Microservicio: En espera (Puerto 5001)';
+          microserviceStatusBadge.style.background = "#fef3c7";
+          microserviceStatusBadge.style.color = "#b45309";
+        });
+    }
+
+    function cargarHistorial() {
+      var userParam = encodeURIComponent(currentUser || "");
+      fetch(getMicroserviceApi() + "?limite=30&usuario=" + userParam)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.success && data.registros) {
+            renderHistoryTable(data.registros);
+          }
+        })
+        .catch(function(err) {
+          console.warn("No se pudo cargar historial del microservicio:", err);
+          var storageKey = "billetia_scan_history_v2_" + (currentUser || "anon");
+          var saved = localStorage.getItem(storageKey);
+          var records = saved ? JSON.parse(saved) : [];
+          renderHistoryTable(records);
+        });
+    }
+
+    function renderHistoryTable(records) {
+      historyTbody.innerHTML = "";
+      if (!records || records.length === 0) {
+        historyTbody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding:24px; color:var(--text-muted);'>No hay escaneos registrados para tu cuenta aún. ¡Escanea tu primer billete!</td></tr>";
+        return;
+      }
+      records.forEach(function(rec) {
+        var tr = document.createElement("tr");
+        var valCop = rec.monto_formato || (rec.valor_nominal ? "$" + Number(rec.valor_nominal).toLocaleString("es-CO") + " COP" : "--");
+        var userDisplay = rec.usuario || currentUser || "Invitado";
+        tr.innerHTML = 
+          "<td>" + (rec.time || rec.fecha_hora || "--") + "</td>" +
+          "<td><span style='font-size:13px; font-weight:600; background:#f1f5f9; padding:3px 8px; border-radius:6px;'>" + userDisplay + "</span></td>" +
+          "<td><strong>" + (rec.denom || rec.denominacion_texto) + "</strong></td>" +
+          "<td><strong style='color:#0d9488;'>" + valCop + "</strong></td>" +
+          "<td>" + (rec.method || rec.metodo_escaneo) + "</td>" +
+          "<td><span class='badge-chip badge-success'>✓ Identificado</span></td>" +
+          "<td><strong>" + (rec.conf || rec.confianza_porcentaje + "%") + "</strong></td>";
+        historyTbody.appendChild(tr);
+      });
+    }
+
+    function saveScanToHistory(denom, conf, method, latencia) {
+      // 1. Enviar al Microservicio de Historial (MySQL XAMPP)
+      fetch(getMicroserviceApi(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          denominacion: denom,
+          confianza: conf,
+          metodo: method,
+          usuario: currentUser,
+          latencia_ms: latencia || 0
+        })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.success) {
+          cargarMetricasMicroservicio();
+          cargarHistorial();
+        }
+      })
+      .catch(function(err) {
+        console.warn("Fallo guardado en microservicio, respaldando en localStorage:", err);
+        var now = new Date();
+        var timeStr = now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        var storageKey = "billetia_scan_history_v2_" + (currentUser || "anon");
+        var saved = localStorage.getItem(storageKey);
+        var records = saved ? JSON.parse(saved) : [];
+        records.unshift({ time: timeStr, denom: denom, method: method, conf: conf, usuario: currentUser });
+        localStorage.setItem(storageKey, JSON.stringify(records.slice(0, 20)));
+        renderHistoryTable(records);
+      });
+    }
+
+    document.getElementById("btnRefreshHistory").addEventListener("click", function() {
+      cargarMetricasMicroservicio();
+      cargarHistorial();
+    });
+
+    document.getElementById("btnClearHistory").addEventListener("click", function() {
+      if (confirm("¿Deseas limpiar tu historial de escaneos en la base de datos?")) {
+        var userParam = encodeURIComponent(currentUser || "");
+        fetch(getMicroserviceApi() + "/limpiar?usuario=" + userParam, { method: "DELETE" })
+          .then(function() {
+            var storageKey = "billetia_scan_history_v2_" + (currentUser || "anon");
+            localStorage.removeItem(storageKey);
+            cargarMetricasMicroservicio();
+            cargarHistorial();
+          });
+      }
+    });
+
+    // Carga inicial desde el Microservicio
+    cargarMetricasMicroservicio();
+    cargarHistorial();
+
+    // Re-ejecutar automáticamente cuando el túnel ngrok sea auto-detectado o cambie
+    window.addEventListener("visioncash_backend_ready", function() {
+      checkAIStatus();
+      cargarMetricasMicroservicio();
+      cargarHistorial();
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BilletIA · Centro de Soporte</title>
+<meta name="description" content="Mesa de ayuda inteligente y soporte técnico de BilletIA con clasificación asistida por IA." />
+<style>
+  :root {
+    --navy-900: #0a1633;
+    --navy-800: #0d1b3e;
+    --navy-700: #10214a;
+    --blue: #2f7bff;
+    --blue-bright: #3b82f6;
+    --purple: #6d3bf5;
+    --teal: #14b8a6;
+    --amber: #f5b13b;
+    --page-bg: #eef1f8;
+    --card: #ffffff;
+    --text-dark: #1e2a52;
+    --text-muted: #55608a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--page-bg);
+    color: var(--text-dark);
+    line-height: 1.5;
+  }
+
+  a { text-decoration: none; color: inherit; }
+
+  .container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* ===== Header ===== */
+  .site-header {
+    background: linear-gradient(180deg, #0b1838 0%, #0d1c40 100%);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .brand img { width: 74px; height: 74px; object-fit: contain; }
+  .brand-name {
+    font-size: 30px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .brand-name .ia { color: var(--blue-bright); }
+  .brand-tagline {
+    font-size: 15px;
+    color: #b9c3e0;
+    margin-top: 2px;
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  .nav a { color: #dbe2f5; font-size: 17px; font-weight: 500; transition: color 0.2s; }
+  .nav a:hover { color: #fff; }
+  .nav .pill {
+    background: linear-gradient(90deg, var(--blue) 0%, var(--purple) 100%);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(60,90,240,0.4);
+  }
+  .nav .logout-btn {
+    color: #fca5a5;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .nav .logout-btn:hover {
+    color: #ef4444;
+  }
+
+  /* ===== Main ===== */
+  main { padding: 40px 0 20px; }
+
+  /* ===== Hero ===== */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 22px;
+    background:
+      radial-gradient(120% 120% at 85% 20%, rgba(109,59,245,0.55) 0%, rgba(13,27,64,0) 55%),
+      linear-gradient(120deg, #0b1838 0%, #14204d 55%, #241a5c 100%);
+    padding: 50px 60px;
+    color: #fff;
+    margin-bottom: 36px;
+  }
+  .eyebrow {
+    display: inline-block;
+    background: rgba(47,123,255,0.25);
+    color: var(--blue-bright);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    border: 1px solid rgba(59,130,246,0.3);
+  }
+  .hero h1 {
+    font-size: 44px;
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 14px;
+  }
+  .hero h1 .accent { color: var(--blue-bright); }
+  .hero p {
+    font-size: 17.5px;
+    color: #c9d2ec;
+    max-width: 780px;
+    line-height: 1.65;
+    margin-bottom: 22px;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .meta-tag {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    color: #dbe2f5;
+  }
+
+  /* ===== Grid Layout ===== */
+  .support-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 30px;
+    margin-bottom: 36px;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 36px;
+    box-shadow: 0 12px 30px rgba(30,42,82,0.08);
+  }
+  .card h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--navy-900);
+    margin-bottom: 8px;
+  }
+  .card p {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  /* Form controls */
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+  }
+  .form-group input, .form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid #cfd9ed;
+    background: #fff;
+    font: inherit;
+    font-size: 15px;
+    color: var(--text-dark);
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  .form-group input:focus, .form-group textarea:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px rgba(47,123,255,0.12);
+  }
+  .form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+  .helper {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    display: block;
+  }
+
+  .actions {
+    display: flex;
+    gap: 14px;
+    margin-top: 24px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 13px 26px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s ease;
+  }
+  .btn-primary {
+    background: linear-gradient(90deg, var(--blue) 0%, var(--purple) 100%);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(60,90,240,0.35);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(60,90,240,0.5);
+  }
+  .btn-secondary {
+    background: #f0f4fc;
+    color: var(--navy-900);
+    border: 1px solid #d0dbe9;
+  }
+  .btn-secondary:hover {
+    background: #e2ebf8;
+  }
+
+  /* Classification preview box */
+  .classify-box {
+    display: none;
+    background: linear-gradient(135deg, #f0fdf4 0%, #e6f9ed 100%);
+    border: 1px solid #bbf7d0;
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 24px;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .classify-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .classify-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #166534;
+  }
+  .ticket-code {
+    background: #166534;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+  }
+  .badge-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .badge-type { background: #e0f2fe; color: #0284c7; }
+  .badge-priority { background: #fef3c7; color: #b45309; }
+  .badge-eta { background: #f3f4f6; color: #374151; }
+
+  /* Info Side List */
+  .side-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .info-block {
+    background: #f8faff;
+    border: 1px solid #e2e8f4;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 14px;
+  }
+  .info-block h3 {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--navy-900);
+    margin-bottom: 8px;
+  }
+  .info-block p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 0;
+  }
+
+  /* Cases Board */
+  .cases-card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 36px;
+    box-shadow: 0 12px 30px rgba(30,42,82,0.08);
+    margin-bottom: 36px;
+  }
+  .cases-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .cases-head h3 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--navy-900);
+  }
+  .case-list {
+    display: grid;
+    gap: 16px;
+  }
+  .case-item {
+    background: #f8faff;
+    border: 1px solid #e2e8f4;
+    border-radius: 16px;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    transition: all 0.2s ease;
+  }
+  .case-item:hover {
+    border-color: var(--blue);
+    background: #edf3ff;
+    transform: translateY(-2px);
+  }
+  .case-info h4 {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--navy-900);
+    margin-bottom: 6px;
+  }
+  .case-info p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 0;
+  }
+  .case-tags {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .status-tag {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .status-open { background: #fef3c7; color: #b45309; }
+  .status-progress { background: #e0f2fe; color: #0284c7; }
+  .status-resolved { background: #dcfce7; color: #16a34a; }
+
+  /* ===== Footer ===== */
+  .site-footer {
+    background: linear-gradient(180deg, #0c1a3d 0%, #0a1430 100%);
+    color: #c4cdea;
+    padding: 56px 0 0;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: 50px;
+    padding-bottom: 44px;
+  }
+  .footer-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+  .footer-brand img { width: 62px; height: 62px; object-fit: contain; }
+  .footer-brand .brand-name { font-size: 26px; }
+  .footer-brand .brand-tagline { font-size: 13px; }
+  .footer-col p { font-size: 15.5px; line-height: 1.7; color: #aab5d8; }
+  .footer-col h4 {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+  .footer-links li { display: flex; align-items: center; gap: 12px; }
+  .footer-links svg { width: 20px; height: 20px; stroke: #6f8bff; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+  .footer-links a { color: #aab5d8; }
+  .footer-links a:hover { color: #fff; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    padding: 24px 0;
+    font-size: 15px;
+    color: #9aa6cc;
+  }
+  .footer-bar { height: 8px; background: linear-gradient(90deg, #2f7bff 0%, #6d3bf5 100%); }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 1100px) {
+    .support-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 720px) {
+    .container { padding: 0 20px; }
+    .header-inner { flex-direction: column; gap: 18px; padding: 20px; }
+    .nav { gap: 16px; flex-wrap: wrap; justify-content: center; }
+    .hero { padding: 34px 24px; }
+    .hero h1 { font-size: 32px; }
+    .card { padding: 24px 18px; }
+    .cases-card { padding: 24px 18px; }
+    .footer-grid { grid-template-columns: 1fr; gap: 34px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <img src="billetia-logo.png" alt="Logo de BilletIA" />
+        <div>
+          <div class="brand-name">Billet<span class="ia">IA</span></div>
+          <div class="brand-tagline">Reconoce &middot; Analiza &middot; Confiable</div>
+        </div>
+      </a>
+      <nav class="nav" aria-label="Navegaci&oacute;n principal">
+        <a href="Menu_principal.html">Inicio</a>
+        <a href="Soporte.html" class="pill">Soporte</a>
+        <a href="acerca_nosotros.html">Acerca de nosotros</a>
+        <a href="Contacto.html">Contacto</a>
+        <a href="javascript:void(0)" id="logoutBtn" class="logout-btn">Cerrar sesi&oacute;n</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main>
+    <div class="container">
+
+      <!-- Hero -->
+      <section class="hero">
+        <div class="eyebrow">&#129302; Mesa de Ayuda Inteligente</div>
+        <h1>Cu&eacute;ntanos tu caso y lo analizamos <span class="accent">autom&aacute;ticamente</span></h1>
+        <p>Desde este panel puedes reportar incidencias t&eacute;cnicas o solicitar mejoras. Nuestro motor de IA eval&uacute;a tu caso, calcula la prioridad y define el tiempo estimado de atenci&oacute;n.</p>
+        <div class="hero-meta">
+          <span class="meta-tag">&#9679; Usuario: <strong id="loggedUser">Usuario</strong></span>
+          <span class="meta-tag">&#10003; Clasificaci&oacute;n asistida por IA</span>
+          <span class="meta-tag">&#128274; Trazabilidad garantizada</span>
+        </div>
+      </section>
+
+      <!-- Support Grid -->
+      <section class="support-grid">
+
+        <!-- Form Card -->
+        <article class="card">
+          <h2>Registrar nuevo caso</h2>
+          <p>Describe el asunto y proporciona el contexto de lo ocurrido para una asignaci&oacute;n precisa.</p>
+
+          <form id="supportForm">
+            <div class="form-group">
+              <label for="ticketTitle">Asunto del requerimiento</label>
+              <input type="text" id="ticketTitle" placeholder="Ej: Error al reconocer billete de $50.000 con poca luz" required />
+              <span class="helper">Usa un t&iacute;tulo corto y conciso.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="ticketDescription">Descripci&oacute;n detallada</label>
+              <textarea id="ticketDescription" placeholder="Cuéntanos qué pasó, qué dispositivo usas y qué esperabas que sucediera..." required></textarea>
+              <span class="helper">M&iacute;nimo 15 caracteres.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="ticketFile">Adjuntar captura o imagen (opcional)</label>
+              <input type="file" id="ticketFile" accept="image/*" />
+              <span class="helper">Formatos soportados: JPG, PNG, WEBP hasta 5MB.</span>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="btn btn-primary" id="btnSubmitTicket">Enviar a soporte</button>
+              <button type="reset" class="btn btn-secondary" id="btnClearForm">Limpiar</button>
+            </div>
+          </form>
+
+          <!-- Classification Success Box -->
+          <div class="classify-box" id="classifyBox">
+            <div class="classify-top">
+              <div class="classify-title">&#10003; Caso registrado con &eacute;xito</div>
+              <span class="ticket-code" id="classifyCode">CAS-004819</span>
+            </div>
+            <p style="margin-bottom:12px;font-size:14px;color:#166534;" id="classifySummary">Tu caso ha sido clasificado por nuestra red neuronal de soporte.</p>
+            <div class="badge-row">
+              <span class="badge badge-type" id="typeBadge">Incidencia</span>
+              <span class="badge badge-priority" id="priorityBadge">Prioridad Alta</span>
+              <span class="badge badge-eta" id="etaBadge">Tiempo estimado: 24h</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Right Info Stack -->
+        <div class="side-stack">
+          <article class="card">
+            <h2>&iquest;C&oacute;mo decide la IA?</h2>
+            <div class="info-block">
+              <h3>&#128065; Incidencia</h3>
+              <p>Se asigna cuando describes una falla, error en la c&aacute;mara, lentitud o bloqueo de la app.</p>
+            </div>
+            <div class="info-block">
+              <h3>&#128161; Requerimiento</h3>
+              <p>Se asigna cuando solicitas una nueva caracter&iacute;stica, sugerencia de dise&ntilde;o o integraci&oacute;n adicional.</p>
+            </div>
+            <div class="info-block" style="margin-bottom:0;">
+              <h3>&#9889; Prioridad &amp; SLA</h3>
+              <p>Seg&uacute;n el impacto en la operaci&oacute;n, se define un tiempo de respuesta de 4 a 48 horas h&aacute;biles.</p>
+            </div>
+          </article>
+        </div>
+
+      </section>
+
+      <!-- KPI Dashboard de Mesa de Ayuda (Medible) -->
+      <section class="cases-card" style="margin-bottom:30px; background:linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);">
+        <div class="cases-head">
+          <div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <h3 style="margin-bottom:2px;">&#128202; Panel de KPIs &amp; Niveles de Servicio (Mesa de Ayuda)</h3>
+              <span style="background:#e0f2fe; color:#0369a1; padding:3px 10px; border-radius:999px; font-size:12px; font-weight:700;">Base de datos MySQL (192.168.0.12)</span>
+            </div>
+            <p style="font-size:14px; color:var(--text-muted); margin-bottom:0;">Indicadores clave de rendimiento (KPIs) calculados en tiempo real desde la tabla <code>mesa_ayuda_tickets</code>.</p>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:18px; margin-top:20px;">
+          <!-- KPI 1: Cumplimiento de SLA -->
+          <div style="background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:18px; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:12.5px; font-weight:700; color:#047857; text-transform:uppercase;">&#9201; Cumplimiento SLA</span>
+              <span style="font-size:16px;">&#10004;</span>
+            </div>
+            <div style="font-size:26px; font-weight:800; color:#065f46;" id="kpiCumplimientoSLA">100%</div>
+            <div style="font-size:12.5px; color:#10b981; font-weight:600; margin-top:4px;">Casos dentro del tiempo límite</div>
+          </div>
+
+          <!-- KPI 2: MTTR (Tiempo Medio de Resolución) -->
+          <div style="background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:18px; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:12.5px; font-weight:700; color:#1d4ed8; text-transform:uppercase;">&#9889; MTTR Promedio</span>
+              <span style="font-size:16px;">&#9203;</span>
+            </div>
+            <div style="font-size:26px; font-weight:800; color:#1e3a8a;" id="kpiMTTR">20.0 h</div>
+            <div style="font-size:12.5px; color:#3b82f6; font-weight:600; margin-top:4px;">Tiempo medio de solución</div>
+          </div>
+
+          <!-- KPI 3: Satisfacción CSAT -->
+          <div style="background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:18px; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:12.5px; font-weight:700; color:#b45309; text-transform:uppercase;">&#11088; Satisfacción CSAT</span>
+              <span style="font-size:16px;">&#128522;</span>
+            </div>
+            <div style="font-size:26px; font-weight:800; color:#92400e;" id="kpiCSAT">4.50 / 5.0</div>
+            <div style="font-size:12.5px; color:#f59e0b; font-weight:600; margin-top:4px;">Calificación de usuarios</div>
+          </div>
+
+          <!-- KPI 4: Ratio Incidencias vs Requerimientos -->
+          <div style="background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:18px; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:12.5px; font-weight:700; color:#6d28d9; text-transform:uppercase;">&#128203; Tipología de Casos</span>
+              <span style="font-size:16px;">&#9878;</span>
+            </div>
+            <div style="font-size:22px; font-weight:800; color:#4c1d95;" id="kpiRatioTipos">2 Inc. / 1 Req.</div>
+            <div style="font-size:12.5px; color:#7c3aed; font-weight:600; margin-top:4px;" id="kpiTotalTickets">3 tickets totales</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cases Board -->
+      <section class="cases-card">
+        <div class="cases-head">
+          <h3>Mis casos y solicitudes recientes</h3>
+          <button type="button" class="btn btn-secondary" id="btnRefreshCases" style="padding:8px 18px;font-size:14px;">&#8635; Actualizar</button>
+        </div>
+        <div class="case-list" id="caseList">
+          <!-- Cargado dinámicamente desde MySQL -->
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-brand">
+            <img src="billetia-logo.png" alt="Logo de BilletIA" />
+            <div>
+              <div class="brand-name">Billet<span class="ia" style="color:var(--blue-bright)">IA</span></div>
+              <div class="brand-tagline">Reconoce &middot; Analiza &middot; Confiable</div>
+            </div>
+          </div>
+          <p>BilletIA es una soluci&oacute;n de inteligencia artificial dise&ntilde;ada para facilitar la identificaci&oacute;n de billetes colombianos a trav&eacute;s de la c&aacute;mara de tu dispositivo.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Gracias por visitar</h4>
+          <p>Tu confianza nos motiva a seguir mejorando. Si encuentras alg&uacute;n inconveniente o tienes sugerencias, no dudes en contactarnos. Estamos para ayudarte.</p>
+        </div>
+
+        <div class="footer-col">
+          <ul class="footer-links">
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+              <a href="Contacto.html">Contacto</a>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              <a href="Terminos.html">T&eacute;rminos y condiciones</a>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <a href="Politicas.html">Pol&iacute;ticas de privacidad</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        &copy; 2025 BilletIA &nbsp;&middot;&nbsp; Inteligencia artificial al servicio de tu seguridad financiera.
+      </div>
+    </div>
+    <div class="footer-bar"></div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="sesion.js"></script>
+  <script>
+    var loggedUser = window.usuarioAutenticado || sessionStorage.getItem("gv_auth_user") || "Usuario";
+    document.getElementById("loggedUser").textContent = loggedUser;
+
+    var supportForm = document.getElementById("supportForm");
+    var classifyBox = document.getElementById("classifyBox");
+    var btnSubmitTicket = document.getElementById("btnSubmitTicket");
+    var caseList = document.getElementById("caseList");
+
+    // 1. Cargar KPIs desde la base de datos MySQL (XAMPP 192.168.0.12)
+    function cargarKPIs() {
+      fetch(CONFIG.apiUrl("/api/soporte/kpis"))
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.success && data.kpis) {
+            var k = data.kpis;
+            document.getElementById("kpiCumplimientoSLA").textContent = k.cumplimiento_sla_pct + "%";
+            document.getElementById("kpiMTTR").textContent = k.mttr_horas_promedio + " h";
+            document.getElementById("kpiCSAT").textContent = Number(k.csat_promedio).toFixed(2) + " / 5.0";
+            document.getElementById("kpiRatioTipos").textContent = k.total_incidencias + " Inc. / " + k.total_requerimientos + " Req.";
+            document.getElementById("kpiTotalTickets").textContent = k.total_tickets + " tickets totales (" + k.tasa_resolucion_pct + "% resueltos)";
+          }
+        })
+        .catch(function(err) {
+          console.warn("No se pudieron cargar KPIs de MySQL:", err);
+        });
+    }
+
+    // 2. Cargar lista de Tickets desde MySQL
+    function cargarTickets() {
+      fetch(CONFIG.apiUrl("/api/soporte/tickets?usuario=" + encodeURIComponent(loggedUser)))
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.success && data.tickets) {
+            renderTicketsList(data.tickets);
+          }
+        })
+        .catch(function(err) {
+          console.warn("No se pudieron cargar tickets de MySQL:", err);
+        });
+    }
+
+    function renderTicketsList(tickets) {
+      caseList.innerHTML = "";
+      if (!tickets || tickets.length === 0) {
+        caseList.innerHTML = "<p style='color:var(--text-muted); padding:16px;'>No tienes solicitudes registradas aún. Puedes abrir una arriba.</p>";
+        return;
+      }
+      tickets.forEach(function(t) {
+        var item = document.createElement("div");
+        item.className = "case-item";
+        
+        var tipoBadge = t.tipo === "incidencia" 
+          ? "<span style='color:#b91c1c; font-weight:700;'>[Incidencia Técnica]</span>" 
+          : "<span style='color:#0369a1; font-weight:700;'>[Requerimiento]</span>";
+
+        var statusClass = "status-open";
+        var statusText = "Abierto";
+        if (t.estado === "en_proceso") {
+          statusClass = "status-progress";
+          statusText = "En proceso";
+        } else if (t.estado === "resuelto" || t.estado === "cerrado") {
+          statusClass = "status-resolved";
+          statusText = "Resuelto";
+        }
+
+        var csatHtml = "";
+        if ((t.estado === "resuelto" || t.estado === "cerrado") && !t.calificacion_csat) {
+          csatHtml = '<div style="margin-top:8px; font-size:13px; color:#4b5563;">' +
+            '¿Cómo calificarías la atención? ' +
+            '<button onclick="calificarTicket(\'' + t.codigo_ticket + '\', 5)" style="cursor:pointer; background:none; border:none; font-size:16px;">⭐⭐⭐⭐⭐</button>' +
+            '</div>';
+        } else if (t.calificacion_csat) {
+          csatHtml = '<div style="margin-top:6px; font-size:13px; color:#d97706; font-weight:700;">Calificación: ' + '★'.repeat(t.calificacion_csat) + ' (' + t.calificacion_csat + '/5)</div>';
+        }
+
+        item.innerHTML = 
+          '<div class="case-info">' +
+            '<h4>' + t.codigo_ticket + ' &middot; ' + t.titulo + '</h4>' +
+            '<p>' + tipoBadge + ' &middot; Prioridad ' + (t.prioridad || "media").toUpperCase() + ' &middot; Registrado: ' + (t.fecha_creacion || "Reciente") + '</p>' +
+            (t.comentarios_resolucion ? '<p style="color:#059669; font-size:13px; margin-top:4px;"><strong>Solución:</strong> ' + t.comentarios_resolucion + '</p>' : '') +
+            csatHtml +
+          '</div>' +
+          '<div class="case-tags">' +
+            '<span class="status-tag ' + statusClass + '">' + statusText + '</span>' +
+          '</div>';
+
+        caseList.appendChild(item);
+      });
+    }
+
+    // 3. Calificar Satisfacción (Alimenta el KPI CSAT)
+    window.calificarTicket = function(codigo, estrellas) {
+      fetch(CONFIG.apiUrl("/api/soporte/tickets/" + encodeURIComponent(codigo) + "/calificar"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ calificacion: estrellas })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.success) {
+          alert("¡Gracias por tu calificación! El índice KPI CSAT ha sido actualizado.");
+          cargarKPIs();
+          cargarTickets();
+        }
+      });
+    };
+
+    // 4. Registrar Ticket en MySQL
+    supportForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      var title = document.getElementById("ticketTitle").value.trim();
+      var desc = document.getElementById("ticketDescription").value.trim();
+
+      if (title.length < 3 || desc.length < 10) {
+        alert("Por favor completa los campos con información válida.");
+        return;
+      }
+
+      btnSubmitTicket.disabled = true;
+      btnSubmitTicket.textContent = "Clasificando con IA y guardando en MySQL...";
+
+      fetch(CONFIG.apiUrl("/api/soporte/tickets"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          titulo: title,
+          descripcion: desc,
+          usuario: loggedUser,
+          categoria: "Reconocimiento IA"
+        })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        btnSubmitTicket.disabled = false;
+        btnSubmitTicket.textContent = "Enviar a soporte";
+
+        if (data.success && data.ticket) {
+          var t = data.ticket;
+          document.getElementById("classifyCode").textContent = t.codigo_ticket;
+          document.getElementById("typeBadge").textContent = t.tipo_str;
+          document.getElementById("priorityBadge").textContent = t.prioridad_str;
+          document.getElementById("etaBadge").textContent = t.eta_str;
+          classifyBox.style.display = "block";
+
+          supportForm.reset();
+          cargarKPIs();
+          cargarTickets();
+        } else {
+          alert("Aviso: " + (data.error || "No se pudo registrar"));
+        }
+      })
+      .catch(function(err) {
+        btnSubmitTicket.disabled = false;
+        btnSubmitTicket.textContent = "Enviar a soporte";
+        alert("Error de conexión con el servidor: " + err.message);
+      });
+    });
+
+    document.getElementById("btnRefreshCases").addEventListener("click", function() {
+      cargarKPIs();
+      cargarTickets();
+    });
+
+    // Carga inicial
+    cargarKPIs();
+    cargarTickets();
+  </script>
+
+</body>
+</html>
