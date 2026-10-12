@@ -48,6 +48,7 @@ MODEL_PATH   = BASE_DIR / "motor_ia" / "modelos_entrenados" / "banknote_efficien
 CLASSES_PATH = BASE_DIR / "motor_ia" / "modelos_entrenados" / "classes.json"
 CONFIG_JS_PATH = BASE_DIR / "presentacion" / "codigo_fuente" / "servicios_api" / "config.js"
 CONFIG_JS_VISTAS_PATH = BASE_DIR / "presentacion" / "codigo_fuente" / "vistas" / "config.js"
+CONFIG_JS_ROOT_PATH = BASE_DIR / "config.js"  # GitHub Pages usa este
 NGROK_TXT_PATH = BASE_DIR / "componentes_transversales" / "configuracion" / "ngrok_url.txt"
 VISTAS_DIR   = BASE_DIR / "presentacion" / "codigo_fuente" / "vistas"
 PUBLICO_DIR  = BASE_DIR / "presentacion" / "publico"
@@ -1193,7 +1194,7 @@ def iniciar_sincronizador_ngrok():
                     txt_path.write_text(curr_url, encoding="utf-8")
 
                     # Actualizar config.js en ambas ubicaciones organizadas
-                    for c_path in [CONFIG_JS_PATH, CONFIG_JS_VISTAS_PATH]:
+                    for c_path in [CONFIG_JS_PATH, CONFIG_JS_VISTAS_PATH, CONFIG_JS_ROOT_PATH]:
                         if c_path.exists():
                             c = c_path.read_text(encoding="utf-8")
                             c_new = re.sub(r'var NGROK_DEFAULT = ".*?";', f'var NGROK_DEFAULT = "{curr_url}";', c)
@@ -1205,7 +1206,8 @@ def iniciar_sincronizador_ngrok():
                         subprocess.run(["git", "add",
                                         "componentes_transversales/configuracion/ngrok_url.txt",
                                         "presentacion/codigo_fuente/servicios_api/config.js",
-                                        "presentacion/codigo_fuente/vistas/config.js"],
+                                        "presentacion/codigo_fuente/vistas/config.js",
+                                        "config.js"],
                                        cwd=str(BASE_DIR), capture_output=True, timeout=10)
                         subprocess.run(["git", "commit", "-m", f"Auto-update ngrok URL: {curr_url}"], cwd=str(BASE_DIR), capture_output=True, timeout=10)
                         subprocess.run(["git", "push", "origin", "main"], cwd=str(BASE_DIR), capture_output=True, timeout=20)
