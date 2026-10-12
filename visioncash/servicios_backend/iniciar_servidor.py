@@ -52,12 +52,18 @@ def after_request_cors(response):
     response.headers["ngrok-skip-browser-warning"] = "true"
     return response
 
+# Raíz del proyecto (Lo que hay en google/)
 BASE_DIR     = Path(__file__).resolve().parents[2]
+# Directorio visioncash/
 VC_DIR       = Path(__file__).resolve().parents[1]
-MODEL_PATH   = BASE_DIR / "visioncash" / "motor_ia" / "modelos_entrenados" / "banknote_efficientnetv2s.pt"
+# Rutas de la nueva estructura organizada
+MODEL_PATH   = VC_DIR / "motor_ia" / "modelos_entrenados" / "banknote_efficientnetv2s.pt"
 if not MODEL_PATH.exists(): MODEL_PATH = BASE_DIR / "models" / "banknote_efficientnetv2s.pt"
-CLASSES_PATH = BASE_DIR / "visioncash" / "motor_ia" / "modelos_entrenados" / "classes.json"
+CLASSES_PATH = VC_DIR / "motor_ia" / "modelos_entrenados" / "classes.json"
 if not CLASSES_PATH.exists(): CLASSES_PATH = BASE_DIR / "models" / "classes.json"
+# Rutas de configuración y presentación
+CONFIG_JS_PATH = VC_DIR / "presentacion" / "codigo_fuente" / "servicios_api" / "config.js"
+NGROK_TXT_PATH = VC_DIR / "componentes_transversales" / "configuracion" / "ngrok_url.txt"
 
 MODEL        = None
 CLASSES      = {}
@@ -607,6 +613,11 @@ import hashlib
 import random
 import pyotp
 import qrcode
+# Importar conexion_bd desde su nueva ubicación en la estructura organizada
+import sys as _sys
+_bd_path = str(VC_DIR / "capa_datos" / "base_de_datos")
+if _bd_path not in _sys.path:
+    _sys.path.insert(0, _bd_path)
 from conexion_bd import obtener_conexion, probar_conexion
 
 
@@ -1051,10 +1062,12 @@ def asegurar_microservicio_historial():
         pass
 
     try:
-        script = BASE_DIR / "microservicio_historial.py"
+        script = VC_DIR / "componentes_transversales" / "monitoreo" / "microservicio_historial.py"
+        if not script.exists():
+            script = BASE_DIR / "microservicio_historial.py"
         if script.exists():
             log.info("[Auto-Recuperación] Microservicio 5001 apagado. Iniciando automáticamente...")
-            subprocess.Popen([sys.executable, str(script)], cwd=str(BASE_DIR))
+            subprocess.Popen([sys.executable, str(script)], cwd=str(script.parent))
             time.sleep(2.0)
             return True
     except Exception as ex:
@@ -1132,7 +1145,9 @@ def api_ngrok_url():
     """Retorna la URL activa de ngrok para los clientes móviles."""
     url = obtener_ngrok_url_local()
     if not url:
-        txt = BASE_DIR / "ngrok_url.txt"
+        txt = NGROK_TXT_PATH
+        if not txt.exists():
+            txt = BASE_DIR / "ngrok_url.txt"
         if txt.exists():
             url = txt.read_text(encoding="utf-8").strip()
     return jsonify({"success": True, "ngrok_url": url})
@@ -1145,7 +1160,8 @@ def iniciar_sincronizador_ngrok():
     """
     def _worker():
         last_url = ""
-        txt_path = BASE_DIR / "ngrok_url.txt"
+        # Usar la nueva ubicación organizada; fallback a raíz por compatibilidad
+        txt_path = NGROK_TXT_PATH if NGROK_TXT_PATH.exists() else BASE_DIR / "ngrok_url.txt"
         if txt_path.exists():
             try:
                 last_url = txt_path.read_text(encoding="utf-8").strip()
@@ -1159,16 +1175,27 @@ def iniciar_sincronizador_ngrok():
                     log.info(f"[Auto-Ngrok] Nuevo túnel detectado: {curr_url}")
                     last_url = curr_url
                     txt_path.write_text(curr_url, encoding="utf-8")
+                    # También actualizar el ngrok_url.txt de la raíz por compatibilidad
+                    root_txt = BASE_DIR / "ngrok_url.txt"
+                    if root_txt.exists():
+                        root_txt.write_text(curr_url, encoding="utf-8")
 
-                    config_js = BASE_DIR / "config.js"
+                    # Actualizar config.js en la nueva ubicación organizada
+                    config_js = CONFIG_JS_PATH
+                    if not config_js.exists():
+                        config_js = BASE_DIR / "config.js"
                     if config_js.exists():
                         c = config_js.read_text(encoding="utf-8")
                         c_new = re.sub(r'var NGROK_DEFAULT = ".*?";', f'var NGROK_DEFAULT = "{curr_url}";', c)
                         config_js.write_text(c_new, encoding="utf-8")
+                        log.info(f"[Auto-Ngrok] config.js actualizado: {config_js}")
 
                     # Sincronizar automáticamente con GitHub
                     try:
-                        subprocess.run(["git", "add", "ngrok_url.txt", "config.js"], cwd=str(BASE_DIR), capture_output=True, timeout=10)
+                        subprocess.run(["git", "add", "ngrok_url.txt", "config.js",
+                                        "visioncash/componentes_transversales/configuracion/ngrok_url.txt",
+                                        "visioncash/presentacion/codigo_fuente/servicios_api/config.js"],
+                                       cwd=str(BASE_DIR), capture_output=True, timeout=10)
                         subprocess.run(["git", "commit", "-m", f"Auto-update ngrok URL: {curr_url}"], cwd=str(BASE_DIR), capture_output=True, timeout=10)
                         subprocess.run(["git", "push", "origin", "main"], cwd=str(BASE_DIR), capture_output=True, timeout=20)
                         log.info(f"[Auto-Ngrok] GitHub actualizado automáticamente con el túnel: {curr_url}")

@@ -15,9 +15,16 @@ Este microservicio desacoplado se encarga exclusivamente de:
 
 import os
 import re
+import sys
 import datetime
+from pathlib import Path
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+
+# Agregar la ruta de base_de_datos al path para importar conexion_bd
+_bd_path = str(Path(__file__).resolve().parents[2] / "capa_datos" / "base_de_datos")
+if _bd_path not in sys.path:
+    sys.path.insert(0, _bd_path)
 from conexion_bd import obtener_conexion, probar_conexion
 
 app = Flask(__name__)
