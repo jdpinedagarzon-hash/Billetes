@@ -24,7 +24,7 @@ start "VisionCash - Servidor Principal e IA [Puerto 5000]" cmd /k "python servic
 
 timeout /t 3 /nobreak >nul
 
-echo [3/3] Iniciando tunel ngrok en Puerto 5000...
+echo [3/3] Iniciando tunel ngrok en Puerto 5000 (con CORS para GitHub Pages)...
 start "VisionCash - Tunel ngrok" cmd /k "ngrok.exe http 5000"
 
 echo.

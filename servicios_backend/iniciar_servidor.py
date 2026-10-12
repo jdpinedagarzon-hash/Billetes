@@ -24,6 +24,7 @@ import json
 import base64
 import logging
 import threading
+import subprocess
 import re
 import numpy as np
 from pathlib import Path
