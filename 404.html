@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>VisionCash - Redirigiendo...</title>
+  <script>
+    (function() {
+      var pathname = window.location.pathname;
+      var file = pathname.split('/').pop();
+      var targetFile = (file && file.indexOf('.html') !== -1) ? file : "Menu_principal_2.html";
+      
+      // Construir ruta relativa hacia la vista correspondiente
+      var origin = window.location.origin;
+      var repo = "/Billetes/";
+      
+      // Manejar tanto GitHub Pages (/Billetes/) como servidores locales o dominios personalizados
+      var newUrl = "";
+      if (pathname.indexOf(repo) !== -1) {
+        newUrl = origin + repo + "presentacion/codigo_fuente/vistas/" + targetFile;
+      } else {
+        newUrl = origin + "/presentacion/codigo_fuente/vistas/" + targetFile;
+      }
+      
+      window.location.replace(newUrl + window.location.search + window.location.hash);
+    })();
+  </script>
+</head>
+<body style="font-family:system-ui,-apple-system,sans-serif; text-align:center; padding:60px 20px; background:#0a1633; color:#fff;">
+  <h2>Redirigiendo a VisionCash...</h2>
+  <p style="margin-top:12px; color:#94a3b8;">Un momento por favor...</p>
+</body>
+</html>

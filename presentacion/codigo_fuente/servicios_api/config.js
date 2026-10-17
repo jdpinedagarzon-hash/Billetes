@@ -11,8 +11,8 @@
 var CONFIG = (function() {
   "use strict";
 
-  var GITHUB_RAW_URL = "https://raw.githubusercontent.com/jdpinedagarzon-hash/Billetes/main/ngrok_url.txt";
-  var GITHUB_API_URL = "https://api.github.com/repos/jdpinedagarzon-hash/Billetes/contents/ngrok_url.txt";
+  var GITHUB_RAW_URL = "https://raw.githubusercontent.com/jdpinedagarzon-hash/Billetes/main/presentacion/codigo_fuente/vistas/ngrok_url.txt";
+  var GITHUB_API_URL = "https://api.github.com/repos/jdpinedagarzon-hash/Billetes/contents/presentacion/codigo_fuente/vistas/ngrok_url.txt";
 
   var isLocal = (
     window.location.hostname === "localhost" ||

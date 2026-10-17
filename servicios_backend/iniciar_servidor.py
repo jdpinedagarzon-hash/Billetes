@@ -1193,12 +1193,11 @@ def iniciar_sincronizador_ngrok():
                     log.info(f"[Auto-Ngrok] Nuevo túnel detectado: {curr_url}")
                     last_url = curr_url
                     txt_path.write_text(curr_url, encoding="utf-8")
-                    # También escribir en la raíz (GitHub Pages lo busca ahí)
-                    root_txt = BASE_DIR / "ngrok_url.txt"
-                    root_txt.write_text(curr_url, encoding="utf-8")
+                    vistas_txt = BASE_DIR / "presentacion" / "codigo_fuente" / "vistas" / "ngrok_url.txt"
+                    vistas_txt.write_text(curr_url, encoding="utf-8")
 
-                    # Actualizar config.js en todas las ubicaciones
-                    for c_path in [CONFIG_JS_PATH, CONFIG_JS_VISTAS_PATH, CONFIG_JS_ROOT_PATH]:
+                    # Actualizar config.js en las ubicaciones modulares
+                    for c_path in [CONFIG_JS_PATH, CONFIG_JS_VISTAS_PATH]:
                         if c_path.exists():
                             c = c_path.read_text(encoding="utf-8")
                             c_new = re.sub(r'var NGROK_DEFAULT = ".*?";', f'var NGROK_DEFAULT = "{curr_url}";', c)
@@ -1208,11 +1207,10 @@ def iniciar_sincronizador_ngrok():
                     # Sincronizar automáticamente con GitHub
                     try:
                         subprocess.run(["git", "add",
-                                        "ngrok_url.txt",
                                         "componentes_transversales/configuracion/ngrok_url.txt",
+                                        "presentacion/codigo_fuente/vistas/ngrok_url.txt",
                                         "presentacion/codigo_fuente/servicios_api/config.js",
-                                        "presentacion/codigo_fuente/vistas/config.js",
-                                        "config.js"],
+                                        "presentacion/codigo_fuente/vistas/config.js"],
                                        cwd=str(BASE_DIR), capture_output=True, timeout=10)
                         subprocess.run(["git", "commit", "-m", f"Auto-update ngrok URL: {curr_url}"], cwd=str(BASE_DIR), capture_output=True, timeout=10)
                         subprocess.run(["git", "push", "origin", "main"], cwd=str(BASE_DIR), capture_output=True, timeout=20)

@@ -15,8 +15,9 @@ Write-Host ""
 # 1. Comprobar si ngrok ya está corriendo
 $ngrokProc = Get-Process -Name "ngrok" -ErrorAction SilentlyContinue
 if (-not $ngrokProc) {
-    Write-Host "[*] Iniciando ngrok en el puerto 5000..." -ForegroundColor Cyan
-    Start-Process -FilePath "$projectDir\ngrok.exe" -ArgumentList "http 5000" -WindowStyle Minimized
+    $ngrokExe = "$PSScriptRoot\ngrok.exe"
+    if (-not (Test-Path $ngrokExe)) { $ngrokExe = "$projectDir\ngrok.exe" }
+    Start-Process -FilePath $ngrokExe -ArgumentList "http 5000" -WindowStyle Minimized
     Start-Sleep -Seconds 4
 } else {
     Write-Host "[OK] ngrok ya se encuentra en ejecucion." -ForegroundColor Green
@@ -76,8 +77,7 @@ foreach ($cfg in $configPaths) {
 
 # 5. Subir a GitHub
 Write-Host ""
-Write-Host "[*] Sincronizando con GitHub..." -ForegroundColor Cyan
-git add ngrok_url.txt config.js componentes_transversales/configuracion/ngrok_url.txt presentacion/codigo_fuente/servicios_api/config.js presentacion/codigo_fuente/vistas/config.js
+git add componentes_transversales/configuracion/ngrok_url.txt presentacion/codigo_fuente/vistas/ngrok_url.txt presentacion/codigo_fuente/servicios_api/config.js presentacion/codigo_fuente/vistas/config.js
 $commitMsg = "Auto-update ngrok URL: " + $publicUrl
 git commit -m $commitMsg
 git push origin main
