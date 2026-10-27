@@ -50,13 +50,16 @@ if ([string]::IsNullOrEmpty($publicUrl)) {
 Write-Host ""
 Write-Host "[OK] URL publica de ngrok detectada: $publicUrl" -ForegroundColor Green
 
-# 3. Guardar en ngrok_url.txt
+# 3. Guardar en ngrok_url.txt (en configuracion, vistas y raiz)
 $utf8 = New-Object System.Text.UTF8Encoding $false
 $ngrokTxtPath = "$projectDir\componentes_transversales\configuracion\ngrok_url.txt"
-[System.IO.File]::WriteAllText($ngrokTxtPath, $publicUrl, $utf8)
+$ngrokTxtVistas = "$projectDir\presentacion\codigo_fuente\vistas\ngrok_url.txt"
 $ngrokTxtRoot = "$projectDir\ngrok_url.txt"
+
+[System.IO.File]::WriteAllText($ngrokTxtPath, $publicUrl, $utf8)
+[System.IO.File]::WriteAllText($ngrokTxtVistas, $publicUrl, $utf8)
 [System.IO.File]::WriteAllText($ngrokTxtRoot, $publicUrl, $utf8)
-Write-Host "[OK] ngrok_url.txt actualizado con la nueva URL." -ForegroundColor Green
+Write-Host "[OK] ngrok_url.txt actualizado en configuracion y vistas." -ForegroundColor Green
 
 # 4. Actualizar config.js
 $configPaths = @(
@@ -77,9 +80,20 @@ foreach ($cfg in $configPaths) {
 
 # 5. Subir a GitHub
 Write-Host ""
+Write-Host "[*] Sincronizando con repositorio GitHub..." -ForegroundColor Cyan
+
+# Traer posibles cambios remotos con rebase para evitar rechazos si el repo cambio remotamente
+git pull --rebase origin main
+
 git add componentes_transversales/configuracion/ngrok_url.txt presentacion/codigo_fuente/vistas/ngrok_url.txt presentacion/codigo_fuente/servicios_api/config.js presentacion/codigo_fuente/vistas/config.js
-$commitMsg = "Auto-update ngrok URL: " + $publicUrl
-git commit -m $commitMsg
+
+$staged = git diff --cached --name-only
+if ($staged) {
+    $commitMsg = "Auto-update ngrok URL: " + $publicUrl
+    git commit -m $commitMsg
+}
+
+# Empujar cambios a GitHub
 git push origin main
 
 if ($LASTEXITCODE -eq 0) {

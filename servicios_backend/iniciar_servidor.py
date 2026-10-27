@@ -1206,15 +1206,28 @@ def iniciar_sincronizador_ngrok():
 
                     # Sincronizar automáticamente con GitHub
                     try:
+                        # 1. Traer posibles cambios remotos con rebase
+                        subprocess.run(["git", "pull", "--rebase", "origin", "main"], cwd=str(BASE_DIR), capture_output=True, timeout=15)
+
+                        # 2. Agregar archivos de ngrok
                         subprocess.run(["git", "add",
                                         "componentes_transversales/configuracion/ngrok_url.txt",
                                         "presentacion/codigo_fuente/vistas/ngrok_url.txt",
                                         "presentacion/codigo_fuente/servicios_api/config.js",
                                         "presentacion/codigo_fuente/vistas/config.js"],
                                        cwd=str(BASE_DIR), capture_output=True, timeout=10)
-                        subprocess.run(["git", "commit", "-m", f"Auto-update ngrok URL: {curr_url}"], cwd=str(BASE_DIR), capture_output=True, timeout=10)
-                        subprocess.run(["git", "push", "origin", "main"], cwd=str(BASE_DIR), capture_output=True, timeout=20)
-                        log.info(f"[Auto-Ngrok] GitHub actualizado automáticamente con el túnel: {curr_url}")
+
+                        # 3. Comprobar si hay cambios para comitear
+                        diff_chk = subprocess.run(["git", "diff", "--cached", "--name-only"], cwd=str(BASE_DIR), capture_output=True, text=True, timeout=10)
+                        if diff_chk.stdout.strip():
+                            subprocess.run(["git", "commit", "-m", f"Auto-update ngrok URL: {curr_url}"], cwd=str(BASE_DIR), capture_output=True, timeout=10)
+
+                        # 4. Enviar a GitHub
+                        push_proc = subprocess.run(["git", "push", "origin", "main"], cwd=str(BASE_DIR), capture_output=True, text=True, timeout=25)
+                        if push_proc.returncode == 0:
+                            log.info(f"[Auto-Ngrok] GitHub actualizado automáticamente con el túnel: {curr_url}")
+                        else:
+                            log.warning(f"[Auto-Ngrok] Git push falló (código {push_proc.returncode}): {push_proc.stderr.strip()}")
                     except Exception as gerr:
                         log.warning(f"[Auto-Ngrok] Git push falló: {gerr}")
             except Exception as e:
