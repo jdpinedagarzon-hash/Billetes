@@ -85,7 +85,7 @@ Write-Host "[*] Sincronizando con repositorio GitHub..." -ForegroundColor Cyan
 # Traer posibles cambios remotos con rebase para evitar rechazos si el repo cambio remotamente
 git pull --rebase origin main
 
-git add componentes_transversales/configuracion/ngrok_url.txt presentacion/codigo_fuente/vistas/ngrok_url.txt presentacion/codigo_fuente/servicios_api/config.js presentacion/codigo_fuente/vistas/config.js
+git add ngrok_url.txt componentes_transversales/configuracion/ngrok_url.txt presentacion/codigo_fuente/vistas/ngrok_url.txt presentacion/codigo_fuente/servicios_api/config.js presentacion/codigo_fuente/vistas/config.js
 
 $staged = git diff --cached --name-only
 if ($staged) {

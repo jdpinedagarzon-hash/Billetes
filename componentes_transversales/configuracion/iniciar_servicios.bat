@@ -2,7 +2,7 @@
 title VisionCash - Lanzador de Sistema y Microservicio
 color 0B
 echo ============================================================================
-echo            VISIONCASH - SISTEMA DE RECONOCIMIENTO & MICROSERVICIOS
+echo            VISIONCASH - SISTEMA DE RECONOCIMIENTO ^& MICROSERVICIOS
 echo ============================================================================
 echo.
 echo [*] Conectando a Base de Datos MySQL en XAMPP (192.168.0.12:3306)...
@@ -17,12 +17,12 @@ echo.
 echo [1/3] Levantando Microservicio de Historial y Metricas en Puerto 5001...
 start "VisionCash - Microservicio Historial [Puerto 5001]" cmd /k "python componentes_transversales\monitoreo\microservicio_historial.py"
 
-timeout /t 2 /nobreak >nul
+ping 127.0.0.1 -n 3 >nul
 
 echo [2/3] Levantando Servidor Principal Flask e IA en Puerto 5000...
 start "VisionCash - Servidor Principal e IA [Puerto 5000]" cmd /k "python servicios_backend\iniciar_servidor.py"
 
-timeout /t 3 /nobreak >nul
+ping 127.0.0.1 -n 4 >nul
 
 echo [3/3] Iniciando tunel ngrok en Puerto 5000 (con CORS para GitHub Pages)...
 start "VisionCash - Tunel ngrok" cmd /k ""%~dp0ngrok.exe" http 5000"

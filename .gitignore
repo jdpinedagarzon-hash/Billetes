@@ -1,6 +1,8 @@
 # Entornos y binarios pesados
 augmented_dataset/
 ngrok.exe
+.ngrok.exe.old
+*.old
 __pycache__/
 *.pyc
 
@@ -11,4 +13,3 @@ __pycache__/
 .vscode/
 .idea/
 *.log
-/ngrok_url.txt

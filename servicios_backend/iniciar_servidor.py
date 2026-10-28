@@ -1195,6 +1195,8 @@ def iniciar_sincronizador_ngrok():
                     txt_path.write_text(curr_url, encoding="utf-8")
                     vistas_txt = BASE_DIR / "presentacion" / "codigo_fuente" / "vistas" / "ngrok_url.txt"
                     vistas_txt.write_text(curr_url, encoding="utf-8")
+                    root_txt = BASE_DIR / "ngrok_url.txt"
+                    root_txt.write_text(curr_url, encoding="utf-8")
 
                     # Actualizar config.js en las ubicaciones modulares
                     for c_path in [CONFIG_JS_PATH, CONFIG_JS_VISTAS_PATH]:
@@ -1209,8 +1211,9 @@ def iniciar_sincronizador_ngrok():
                         # 1. Traer posibles cambios remotos con rebase
                         subprocess.run(["git", "pull", "--rebase", "origin", "main"], cwd=str(BASE_DIR), capture_output=True, timeout=15)
 
-                        # 2. Agregar archivos de ngrok
+                        # 2. Agregar archivos de ngrok (incluyendo la raíz requerida por la app Android)
                         subprocess.run(["git", "add",
+                                        "ngrok_url.txt",
                                         "componentes_transversales/configuracion/ngrok_url.txt",
                                         "presentacion/codigo_fuente/vistas/ngrok_url.txt",
                                         "presentacion/codigo_fuente/servicios_api/config.js",
