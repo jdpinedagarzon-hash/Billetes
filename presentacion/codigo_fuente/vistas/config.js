@@ -20,7 +20,7 @@ var CONFIG = (function() {
   );
 
   // URL fallback sincronizada con app.py
-  var NGROK_DEFAULT = "https://1704-181-53-12-63.ngrok-free.app";
+  var NGROK_DEFAULT = "https://76b8-181-53-12-63.ngrok-free.app";
 
   var activeApiBase = "";
   var resolucionEnProgreso = false;
